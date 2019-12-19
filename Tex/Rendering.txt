@@ -1,0 +1,59 @@
+#######################################################
+#https://www.martinruenz.de/files/ruenz12bachelor.pdf
+#######################################################
+
+Rendering Models:
+* Hair is to thin to be rendered clasically -> With normals etc (BSDFs)
+* Kajiya and Kay´s Hair Model:
+    * Derived in diffuse and specular component
+    * Specular -> Phong
+    * Diffuse -> Lambertian
+    * Uses hair fiber x0 and its tangent
+    * Is rather easy to implement
+    * Drawbacks:
+        * Not energy conserving -> Needed for physically based Rendering
+        * Missing, that hair is translucent
+    * Can be altered to be energy conserving, but translucency is always lost
+* Marschner Shading model:
+    * Is energy conserving and produces more realistic results
+    * Control parameters are rather complicated, not good comprehensible
+    * Uses three different parts:
+        * R -> Light is reflected directly of the hair
+        * TRT -> Light enters the strand, is then reflected inside the hair and transmitted back outside the hair
+        * TT -> Light enters the strand and is transmitted outside the Backside
+* Artist friendly hair shading system (Sadeghi et al.)
+    * Can produce realistic or unrealistic hair
+    * Pseudo scattering function based on Marschner Shading model
+* Shadows:
+    * Hair can be regarded volumetric object
+    * Self shadowing is crucial
+    * Shadow mapping is possible for environment to hair shadows
+    * With (deep) opacity maps hair to environment shadows are possible
+        * Render from light perspective and accumulate opacity
+    * Another method would be Adaptive volumentric shadows, but this is really costly
+
+
+####################################################
+#http://markusrapp.de/wordpress/wp-content/uploads/hair/MarkusRapp-MasterThesis-RealTimeHairRendering.pdf
+####################################################
+
+Look up Fermi Hair Demo -> Source available
+    * Hair is rendered als front facing quads
+TressFX
+    * Per-Pixel linked lists are used to implement order independent transparency for shadowing
+    * No tesselation:
+        * Isoline to quads would have to occure in the geometry shader -> Too expensive
+
+
+        
+####################################################
+#http://developer.download.nvidia.com/presentations/2010/SIGGRAPH/HairCourse_SIGGRAPH2010.pdf
+####################################################
+
+Hair can be generated via hair mesh
+    * A rough mesh is applied to the head and hairs are generated, which follow this mesh
+How to generate additional hair
+    * Particles are offset in vertex shader and rendered as Iso lines
+    * Tesselation shader breaks down Iso Lines into smaller segments
+    * Geometry shader takes Iso lines and expands them into screen facing quads
+##### There is actual render code her so maybe take another look later

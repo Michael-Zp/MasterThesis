@@ -23,7 +23,7 @@
     <ProjectGuid>{AC94F223-2E76-404C-AED5-67E5D35D54D3}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>TressFXTest</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -108,16 +108,16 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\inc;..\src</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <CompileAsManaged>false</CompileAsManaged>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\Users\Admin\Documents\GitHub\MasterThesis\VSProject\amd_tressfx\lib\VS2017\x64\Lib_Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>GPUOpen_TressFX_x64d.lib;d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>GPUOpen_TressFX_x64d.lib;d3d11.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary>GPUOpen_TressFX_x64d.lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
@@ -160,12 +160,60 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BonyBones.cpp" />
+    <ClCompile Include="d3dApp.cpp" />
+    <ClCompile Include="GameTimer.cpp" />
+    <ClCompile Include="My_EI_LayoutManager.cpp" />
+    <ClCompile Include="My_EI_PSO.cpp" />
     <ClCompile Include="TressFXTest.cpp" />
+    <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\build\AMD_TressFX_2017.vcxproj">
       <Project>{252c0af0-91e1-82e5-1ad6-7cbc868a79e9}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BonyBones.h" />
+    <ClInclude Include="d3dApp.h" />
+    <ClInclude Include="DeviceAndContext.h" />
+    <ClInclude Include="GameTimer.h" />
+    <ClInclude Include="My_Callbacks_2D.h" />
+    <ClInclude Include="My_Callbacks_Allocation.h" />
+    <ClInclude Include="My_Callbacks_Barriers.h" />
+    <ClInclude Include="My_Callbacks_BindSets.h" />
+    <ClInclude Include="My_Callbacks_Copy.h" />
+    <ClInclude Include="My_Callbacks_Counter.h" />
+    <ClInclude Include="My_Callbacks_Drawing.h" />
+    <ClInclude Include="My_Callbacks_Error.h" />
+    <ClInclude Include="My_Callbacks_IO.h" />
+    <ClInclude Include="My_Callbacks_Layouts.h" />
+    <ClInclude Include="My_Callbacks_Mapping.h" />
+    <ClInclude Include="My_Callbacks_RT.h" />
+    <ClInclude Include="My_Callbacks_Simulation.h" />
+    <ClInclude Include="My_Callbacks_StructuredBuffers.h" />
+    <ClInclude Include="My_EI_BindLayout.h" />
+    <ClInclude Include="My_EI_BindSet.h" />
+    <ClInclude Include="My_EI_CommandContext.h" />
+    <ClInclude Include="My_EI_Device.h" />
+    <ClInclude Include="My_EI_IndexBuffer.h" />
+    <ClInclude Include="My_EI_LayoutManager.h" />
+    <ClInclude Include="My_EI_PSO.h" />
+    <ClInclude Include="My_EI_Resource.h" />
+    <ClInclude Include="Utils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="RenderStrands.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

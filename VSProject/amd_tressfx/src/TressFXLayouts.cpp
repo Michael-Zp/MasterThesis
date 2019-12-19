@@ -111,7 +111,7 @@ void CreateRenderPosTanLayout2(EI_Device* pDevice, EI_LayoutManagerRef pLayoutMa
 
 
 
-void CreateRenderLayout2(EI_Device* pDevice, EI_LayoutManagerRef pLayoutManager)
+void CreateRenderLayout2(EI_Device* pDevice, EI_LayoutManagerRef pLayoutManager, bool hasTexture)
 {
  
     static const EI_StringHash srvSlotNames[3] =
@@ -133,7 +133,7 @@ void CreateRenderLayout2(EI_Device* pDevice, EI_LayoutManagerRef pLayoutManager)
 
     static const TressFXLayoutDescription renderLayoutDesc =
     {
-        3,
+        hasTexture ? 3 : 1,
         srvSlotNames,
 
         0,

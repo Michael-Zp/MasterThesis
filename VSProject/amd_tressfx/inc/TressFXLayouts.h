@@ -98,13 +98,13 @@ extern TressFXLayouts*                        g_TressFXLayouts;
 
 
 void CreateSimPosTanLayout2(EI_Device* pDevice, EI_LayoutManagerRef layoutManager);
-void CreateRenderPosTanLayout2(EI_Device* pDevice, EI_LayoutManagerRef layoutManager);
-void CreateRenderLayout2(EI_Device* pDevice, EI_LayoutManagerRef layoutManager);
-void CreateGenerateSDFLayout2(EI_Device* pDevice, EI_LayoutManagerRef layoutManager);
 void CreateSimLayout2(EI_Device* pDevice, EI_LayoutManagerRef layoutManager);
-void CreateApplySDFLayout2(EI_Device* pDevice, EI_LayoutManagerRef pLayoutManager);
+void CreateRenderPosTanLayout2(EI_Device* pDevice, EI_LayoutManagerRef layoutManager);
+void CreateRenderLayout2(EI_Device* pDevice, EI_LayoutManagerRef layoutManager, bool hasTexture);
 void CreateBoneSkinningLayout2(EI_Device* pDevice, EI_LayoutManagerRef pLayoutManager);
+void CreateGenerateSDFLayout2(EI_Device* pDevice, EI_LayoutManagerRef layoutManager);
 void CreateSDFMarchingCubesLayout2(EI_Device* pDevice, EI_LayoutManagerRef pLayoutManager);
+void CreateApplySDFLayout2(EI_Device* pDevice, EI_LayoutManagerRef pLayoutManager);
 void CreatePPLLBuildLayout2(EI_Device* pDevice, EI_LayoutManagerRef pLayoutManager);
 void CreatePPLLReadLayout2(EI_Device* pDevice, EI_LayoutManagerRef pLayoutManager);
 

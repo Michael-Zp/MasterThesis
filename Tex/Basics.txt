@@ -1,0 +1,35 @@
+#######################################################
+#https://www.martinruenz.de/files/ruenz12bachelor.pdf
+#######################################################
+
+Properties of human hair:
+* 50 - 120 micrometer diameter
+* Stiff material, no streching/shearing
+* ~100k hair on average
+* Refraction index 1.55
+* ~200 hair / cm² on scalp
+
+Geometry Generation:
+* Either assisted by a tool (Cinema4D, Blender etc.) or random on scalp faces
+* Particle Interpolation:
+    * Single strand based Interpolation
+        * On stand is extended in an area around the strand
+        * Creatse a wisp
+        * Diraction of interpolated hair is rather similar to base strand
+    * Multi strand based Interpolation
+        * Interpolate new strands in e.g. triangle between three strands (barycentric)
+        * Everything is interpolated between the three strands (angular tendencies, length...)
+
+
+####################################################
+#http://markusrapp.de/wordpress/wp-content/uploads/hair/MarkusRapp-MasterThesis-RealTimeHairRendering.pdf
+####################################################
+
+Look up Fermi Hair Demo -> Source available
+
+
+####################################################
+#https://onlinelibrary.wiley.com/doi/pdf/10.1002/0470023198.ch8
+####################################################
+
+On Page 8/9 there is a really nice overview of simulation/rendering models

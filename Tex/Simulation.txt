@@ -1,0 +1,99 @@
+#######################################################
+#https://www.martinruenz.de/files/ruenz12bachelor.pdf
+#######################################################
+
+Simulation:
+* Elastic rod theory
+* Particle simulation
+* Only able to run for individual strands
+* Rest has to be interpolated
+* Data format:
+    * Root hair position (p0)
+    * List of vectors to next position (v0 = p1 - p0)
+* Methods:
+    * One Dimensional Projective Equations:
+        * Simple, stable and efficient
+        * Cannot simulate torsion
+        * Hard to implement hair-hair interaction
+    * Free-Form Deformations:
+        * More capable than One Dimensional Projective Equations
+        * Treats hair as unit, no single wisps possible
+    * Continuum based simulations:
+        * Commenly used for fluid simulation
+        * Not entierly correct, because hair is not really a fluid (In a fluid there are no individual parts, in hair there are single wisps etc.)
+        * Solved by using rigid multi-body serial chains for single hairs and continuum dynamics for the rest
+    * Mass-Spring Systems
+        * Easy, efficient and produce realistic results
+        * Particles -> Mass point
+        * Segments (Line between particles) -> Spring
+        * Coil springs used for Segments
+        * Angular springs used at particles
+        * Coil springs are restricted by theta (maximal extension, as hair does not extend under normal circumstances)
+        * Angular springs also are used to restore the original form of the hair
+* Methods for numerical integration (Velocity to Position)
+    * Default Euler p1 = p0 + v0 * dT
+        * Needs small dT to work good
+    * Implicit/Beackward Euler
+        * Much better
+    * Verlet method
+        * Even better
+        * Can be replaced by the Velocity Verlet method
+        * Normal Verlet -> Better position integration
+        * Velociyt Verlet -> Better velocity integration
+* Collision:
+    * Particles are represented as pearls (Small spheres)
+    * Every other collider is a sphere -> efficiency
+    * No penalty forces if colliding, but displacements
+
+
+####################################################
+#http://markusrapp.de/wordpress/wp-content/uploads/hair/MarkusRapp-MasterThesis-RealTimeHairRendering.pdf
+####################################################
+
+Look up Fermi Hair Demo -> Source available
+    * Simulation, Tesselation and Interpolation are done with lines
+TressFX
+    * All done on GPU (Direct compute)
+    * Constraints
+        * Global shape Constraints
+            * Initial hair position is goal position of every hair particle
+            * Keeps hair in roughly the same shape all the time (Hairstyle is preserved)
+        * Local hair Constraints:
+            * Simulates bending and twist effects
+        * Edge lenght constraints:
+            * No idea what it does
+    
+
+
+####################################################
+#http://developer.download.nvidia.com/presentations/2010/SIGGRAPH/HairCourse_SIGGRAPH2010.pdf
+####################################################
+
+Simulation steps:
+    * Transform particle by root and return
+    * Move particle out of obstacles
+    * Apply forces (wind, gravity...)
+    * Integrate position using verlet integration
+Wind force simulated using semi-lagragion fluid simulation on a coarse grid
+Self hair collision:
+    * Is pretty much a fluid
+    * Dont use every hair, just guide hairs/wisps of hair -> Otherwise much jitter
+    * Approaches are Hadapo1 Lagragian, Bertailso5 Eulerian, McAdamso9 Hybrid
+    * In general get density of hair as field and push hair away from the gradient in this field
+Avoiding interpolated hair collisions:
+    * Pre pass that checks for collisions between all hair (incl. interpolated hair) with any collider (like shoulders)
+    * If collides -> Set texel to intdex of the first particle, which collides
+    * Otherwise -> Infinity
+    * Render with minimum blending -> Voila map now available that can be used to prevent collisions
+    * Just alter the interpolation method from multi strand to single strand and it will look fine
+
+
+
+####################################################
+#https://www.sciencedirect.com/science/article/pii/S0010448516000154?via%3Dihub
+####################################################
+
+Efficient simulation of realistic motion of 1D flexible objects
+Definitly try to implement it after some spring system
+    * Seems more efficient, a little bit fake, but better performance should be worth it
+        * The motion ofthe flexible 1D objects, represented using splines, is computed using a tractrix base dapproach.

@@ -79,10 +79,10 @@
       <Filter>inc</Filter>
     </ClInclude>
     <ClInclude Include="..\src\TressFXEngineInterface.h">
-      <Filter>src</Filter>
+      <Filter>inc</Filter>
     </ClInclude>
     <ClInclude Include="..\src\TressFXFileFormat.h">
-      <Filter>src</Filter>
+      <Filter>inc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

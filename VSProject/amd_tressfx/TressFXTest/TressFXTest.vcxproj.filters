@@ -18,5 +18,111 @@
     <ClCompile Include="TressFXTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BonyBones.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="My_EI_LayoutManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="My_EI_PSO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameTimer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BonyBones.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="My_EI_Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="My_EI_Device.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="My_EI_CommandContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DeviceAndContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="My_EI_BindSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="My_EI_IndexBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="My_EI_PSO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="My_Callbacks_Error.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="My_Callbacks_Allocation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="My_Callbacks_IO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="My_Callbacks_Layouts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="My_Callbacks_BindSets.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="My_Callbacks_StructuredBuffers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="My_Callbacks_Mapping.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="My_Callbacks_Drawing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="My_Callbacks_Simulation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="My_Callbacks_2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="My_Callbacks_Counter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="My_Callbacks_RT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="My_Callbacks_Copy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="My_Callbacks_Barriers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="My_EI_BindLayout.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="My_EI_LayoutManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dApp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameTimer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="RenderStrands.hlsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

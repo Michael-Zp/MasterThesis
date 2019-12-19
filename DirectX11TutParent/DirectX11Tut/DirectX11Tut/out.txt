@@ -1,0 +1,2 @@
+Card name: NVIDIA GeForce GTX 1080 Ti
+Card memory: 11127 MB

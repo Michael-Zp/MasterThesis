@@ -6,207 +6,57 @@
 #include "TressFXAsset.h"
 #include "TressFXHairObject.h"
 #include "d3d11.h"
-#include "d3d12.h"
 #include <Windows.h>
 #include <direct.h>
 #include <exception>
+#include <string>
+#include <vector>
+#include <DirectXMath.h>
+#include "BonyBones.h"
+#include <fstream>
 
-TressFXLayouts* g_TressFXLayouts = 0;
+#include "My_EI_BindSet.h"
+#include "My_EI_CommandContext.h"
+#include "My_EI_Device.h"
+#include "My_EI_IndexBuffer.h"
+#include "My_EI_PSO.h"
+#include "My_EI_Resource.h"
+#include "My_EI_LayoutManager.h"
+#include "DeviceAndContext.h"
 
-class EI_Resource
+#include "My_Callbacks_2D.h"
+#include "My_Callbacks_Allocation.h"
+#include "My_Callbacks_Barriers.h"
+#include "My_Callbacks_BindSets.h"
+#include "My_Callbacks_Copy.h"
+#include "My_Callbacks_Counter.h"
+#include "My_Callbacks_Drawing.h"
+#include "My_Callbacks_Error.h"
+#include "My_Callbacks_IO.h"
+#include "My_Callbacks_Layouts.h"
+#include "My_Callbacks_Mapping.h"
+#include "My_Callbacks_RT.h"
+#include "My_Callbacks_Simulation.h"
+#include "My_Callbacks_StructuredBuffers.h"
+
+TressFXLayouts* g_TressFXLayouts = new TressFXLayouts();
+
+
+void CreateAllLayouts(DeviceAndContext &dac, EI_PSO **pso, HINSTANCE hInstance) 
 {
-public:
-	ID3D11Buffer* textureBuffer;
-	ID3D11ShaderResourceView* srv;
-	ID3D11UnorderedAccessView* uav;
-};
-
-class EI_Device
-{
-private:
-	ID3D11Device* device;
-public:
-	EI_Device(ID3D11Device* pDevice) : device(pDevice) {}
+	EI_LayoutManager layoutManagerVS(dac.device, L".\\RenderStrands.hlsl", "VS_RenderHair_AA", AMD::EI_ShaderStage::EI_VS);
+	CreateRenderPosTanLayout2(dac.device, layoutManagerVS);
+	CreateRenderLayout2(dac.device, layoutManagerVS, false);
+	EI_LayoutManager layoutManagerPS(dac.device, L".\\RenderStrands.hlsl", "StrandsPS", AMD::EI_ShaderStage::EI_PS);
 
 
-	HRESULT CreateBuffer(const D3D11_BUFFER_DESC *pDesc, const D3D11_SUBRESOURCE_DATA *pInitialData, ID3D11Buffer **ppBuffer) {
-		return device->CreateBuffer(pDesc, pInitialData, ppBuffer);
-	}
-
-	HRESULT CreateSrv(ID3D11Resource *pResource, const D3D11_SHADER_RESOURCE_VIEW_DESC *pDesc, ID3D11ShaderResourceView **ppSRView) {
-		return device->CreateShaderResourceView(pResource, pDesc, ppSRView);
-		
-
-		
-	}
-};
-
-class EI_BindSet
-{
-public:
-	//Identical to TressFXBindSet
-	int     nSRVs;
-	EI_SRV* srvs;
-	int     nUAVs;
-	EI_UAV* uavs;
-	void*   values;
-	int     nBytes;
-};
-
-void myError(EI_StringHash msg)
-{
-	std::cout << msg << std::endl;
+	*pso = new EI_PSO(layoutManagerVS, layoutManagerPS, hInstance, dac);
 }
 
-void myRead(void* ptr, AMD::uint size, EI_StreamRef pFile)
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
+	PSTR cmdLine, int showCmd)
 {
-	fread(ptr, size, 1, (FILE*)pFile);
-}
-
-void mySeek(EI_StreamRef pFile, AMD::uint offset)
-{
-	fseek((FILE*)pFile, offset, SEEK_SET);
-}
-
-void CreateShaderBuffer(EI_Resource* result, EI_Device* pDevice, AMD::uint32 sizeOfElement, AMD::uint32 numberOfElements, EI_StringHash myName, EI_StringHash name, bool isUAV) 
-{
-	D3D11_BUFFER_DESC bufDes;
-	bufDes.ByteWidth = sizeOfElement * numberOfElements;
-	bufDes.Usage = D3D11_USAGE::D3D11_USAGE_DEFAULT;
-	bufDes.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_SHADER_RESOURCE;
-	if (isUAV)
-	{
-		bufDes.BindFlags |= D3D11_BIND_FLAG::D3D11_BIND_UNORDERED_ACCESS;
-	}
-	bufDes.CPUAccessFlags = 0;
-	bufDes.MiscFlags = 0;
-	//MIGHT_NEED: bufDes.StructureByteStride = ?
-	pDevice->CreateBuffer(&bufDes, NULL, &(result->textureBuffer));
-
-	//TODO: Create SRV Desc
-	/*D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc.Format = tex.Format;
-	srvDesc.Texture2D.MipLevels = tex.MipLevels;
-	srvDesc.Texture2D.MostDetailedMip = 0;
-	srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
-	m_device->CreateShaderResourceView(m_textures[i].Get(), &srvDesc, cbvSrvHandle);*/
-	pDevice->CreateSrv(result->textureBuffer, NULL, &(result->srv));
-	if (isUAV)
-	{
-		//TODO: Create UAVs
-	}
-}
-
-EI_Resource* myCreateReadWriteSB(EI_Device* pDevice, AMD::uint32 structSize, AMD::uint32 structCount, EI_StringHash resourceName, EI_StringHash objectName)
-{
-	EI_Resource* result = new EI_Resource;
-	CreateShaderBuffer(result, pDevice, structSize, structCount, resourceName, objectName, true);
-	return result;
-}
-
-EI_Resource* myCreateReadOnlySB(EI_Device* pDevice, AMD::uint32 structSize, AMD::uint32 structCount, EI_StringHash resourceName, EI_StringHash objectName) 
-{
-	EI_Resource* result = new EI_Resource;
-	CreateShaderBuffer(result, pDevice, structSize, structCount, resourceName, objectName, false);
-	return result;
-}
-
-EI_BindSet* myCreateBindSet(EI_Device* device, AMD::TressFXBindSet& pBindSet)
-{
-	EI_BindSet* bindSet = new EI_BindSet;
-
-	bindSet->nSRVs = pBindSet.nSRVs;
-	bindSet->srvs = nullptr;
-	bindSet->nUAVs = pBindSet.nUAVs;
-	bindSet->srvs = nullptr;
-	bindSet->values = pBindSet.values;
-	bindSet->nBytes = pBindSet.nBytes;
-
-	if (pBindSet.nSRVs > 0)
-	{
-		bindSet->srvs = new EI_SRV[pBindSet.nSRVs];
-		memcpy(bindSet->srvs, pBindSet.srvs, sizeof(pBindSet.srvs[0]) * pBindSet.nSRVs);
-	}
-
-
-	if (pBindSet.nUAVs > 0)
-	{
-		bindSet->uavs = new EI_SRV[pBindSet.nUAVs];
-		memcpy(bindSet->uavs, pBindSet.uavs, sizeof(pBindSet.uavs[0]) * pBindSet.nUAVs);
-	}
-
-	return bindSet;
-}
-
-void mySubmitBarriers(EI_CommandContextRef commands, int numBarriers, AMD::EI_Barrier* barriers)
-{
-	for (int i = 0; i < numBarriers; i++)
-	{
-		if (barriers->from == barriers->to)
-		{
-			if (barriers->from == AMD::EI_STATE_UAV)
-			{
-				D3D12_RESOURCE_UAV_BARRIER *bar = new D3D12_RESOURCE_UAV_BARRIER();
-				bar->pResource = barriers->pResource->uav;
-				barriers->pResource.
-			}
-		}
-	}
-}
-
-
-int main()
-{
-	D3D_FEATURE_LEVEL levels[] = {
-	D3D_FEATURE_LEVEL_9_1,
-	D3D_FEATURE_LEVEL_9_2,
-	D3D_FEATURE_LEVEL_9_3,
-	D3D_FEATURE_LEVEL_10_0,
-	D3D_FEATURE_LEVEL_10_1,
-	D3D_FEATURE_LEVEL_11_0,
-	D3D_FEATURE_LEVEL_11_1
-	};
-
-	// This flag adds support for surfaces with a color-channel ordering different
-	// from the API default. It is required for compatibility with Direct2D.
-	UINT deviceFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
-
-#if defined(DEBUG) || defined(_DEBUG)
-	deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
-#endif
-
-	// Create the Direct3D 11 API device object and a corresponding context.
-	ID3D11Device *device;
-	ID3D11DeviceContext *context;
-
-	HRESULT hr = D3D11CreateDevice(
-		nullptr,                    // Specify nullptr to use the default adapter.
-		D3D_DRIVER_TYPE_HARDWARE,   // Create a device using the hardware graphics driver.
-		0,                          // Should be 0 unless the driver is D3D_DRIVER_TYPE_SOFTWARE.
-		deviceFlags,                // Set debug and Direct2D compatibility flags.
-		0,							// List of feature levels this app can support.
-		0,							// Size of the list above.
-		D3D11_SDK_VERSION,          // Always set this to D3D11_SDK_VERSION for Windows Store apps.
-		&device,                    // Returns the Direct3D device created.
-		levels,						// Returns feature level of device created.
-		&context                    // Returns the device immediate context.
-	);
-
-	if (FAILED(hr))
-	{
-		// Handle device interface creation failure if it occurs.
-		// For example, reduce the feature level requirement, or fail over 
-		// to WARP rendering.
-		throw new std::invalid_argument("Faild to get device.");
-	}
-
-	// Store pointers to the Direct3D 11.1 API device and immediate context.
-	/*device.As(&m_pd3dDevice);
-	context.As(&m_pd3dDeviceContext);*/
-
-	EI_Device pDevice = EI_Device(device);
+	DeviceAndContext dac;
 	//DestroyAllLayouts(pDevice);
 
 	AMD::g_Callbacks.pfMalloc = malloc;
@@ -220,20 +70,83 @@ int main()
 	AMD::g_Callbacks.pfCreateReadOnlySB = myCreateReadOnlySB;
 	AMD::g_Callbacks.pfCreateReadWriteSB = myCreateReadWriteSB;
 
+	AMD::g_Callbacks.pfCreateIndexBuffer = myCreateIndexBuffer;
+	AMD::g_Callbacks.pfDraw = myDraw;
+
 	AMD::g_Callbacks.pfCreateBindSet = myCreateBindSet;
+	AMD::g_Callbacks.pfBind = myBind;
+
+	AMD::g_Callbacks.pfCreateLayout = myCreateLayout;
+
+	AMD::g_Callbacks.pfSubmitBarriers = mySubmitBarriers;
+	AMD::g_Callbacks.pfMap = myMap;
+	AMD::g_Callbacks.pfUnmap = myUnmap;
 
 	char _buf[1024];
 	_getcwd(_buf, sizeof(_buf));
 	std::cout << _buf << std::endl;
 
-	FILE* ratboy = fopen(".\\Assets\\Ratboy\\Ratboy_mohawk.tfx", "rb");
+	std::ifstream *ratboy = new std::ifstream(".\\Assets\\Ratboy\\Ratboy_short.tfx", std::ifstream::ate | std::ifstream::binary);
+	std::ifstream *ratboyBones = new std::ifstream(".\\Assets\\Ratboy\\Ratboy_short.tfxbone", std::ifstream::ate | std::ifstream::binary);
+
+	BonyBones bones(*ratboyBones);
 	
+
 	AMD::TressFXAsset asset;
 	asset.LoadHairData(ratboy);
-	fclose(ratboy);
+	//asset.GenerateFollowHairs();
+	asset.LoadBoneData(bones, ratboyBones);
+
 	asset.ProcessAsset();
 
 	TressFXHairObject hair;
-	hair.Create(&asset, &pDevice, (EI_CommandContextRef)context, "myHair", nullptr);
+	hair.Create(&asset, dac.device, dac.GetContext(), "myHair", nullptr);
+
+	EI_PSO *pso;
+	CreateAllLayouts(dac, &pso, hInstance);
+
+	ID3D11RasterizerState *rasterState;
+	ID3D11DepthStencilState *dsState;
+	ID3D11BlendState *blendState;
+
+	D3D11_RASTERIZER_DESC rasterDesc;
+	ZeroMemory(&rasterDesc, sizeof(rasterDesc));
+	rasterDesc.FillMode = D3D11_FILL_SOLID;
+	rasterDesc.CullMode = D3D11_CULL_BACK;
+
+
+	D3D11_DEPTH_STENCIL_DESC dsDesc;
+	ZeroMemory(&dsDesc, sizeof(dsDesc));
+	dsDesc.DepthEnable = true;
+	dsDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+	dsDesc.StencilEnable = false;
+
+
+	D3D11_RENDER_TARGET_BLEND_DESC blendTargetDesc;
+	ZeroMemory(&blendTargetDesc, sizeof(blendTargetDesc));
+	blendTargetDesc.BlendEnable = false;
+	blendTargetDesc.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+	D3D11_BLEND_DESC blendDesc;
+	ZeroMemory(&blendDesc, sizeof(blendDesc));
+	blendDesc.RenderTarget[0] = blendTargetDesc;
+
+	float blendFactors[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	
+	dac.device->device->CreateRasterizerState(&rasterDesc, &rasterState);
+	dac.device->device->CreateDepthStencilState(&dsDesc, &dsState);
+	dac.device->device->CreateBlendState(&blendDesc, &blendState);
+
+	dac.context->context->RSSetState(rasterState);
+	dac.context->context->OMSetDepthStencilState(dsState, 0);
+	dac.context->context->OMSetBlendState(blendState, blendFactors, 0xffffffff);
+
+
+	pso->mTimer.Reset();
+	while (true) {
+		hair.DrawStrands(dac.GetContext(), *pso);
+		pso->FetchMessages();
+		pso->UpdateConstantBuffers(dac);
+	}
 }
 
