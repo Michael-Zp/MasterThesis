@@ -48,7 +48,7 @@ float GameTimer::TotalTime()const
 	}
 }
 
-float GameTimer::DeltaTime()const
+float GameTimer::DeltaTime() const
 {
 	return (float)mDeltaTime;
 }

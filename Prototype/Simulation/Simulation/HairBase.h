@@ -9,7 +9,7 @@ public:
 	HairBase(ID3D11Device *device);
 	~HairBase();
 
-	void Draw(ID3D11DeviceContext *context);
+	void Draw(float deltaTime, ID3D11DeviceContext *context);
 
 	void UpdateCamera(ID3D11DeviceContext *context, XMMATRIX view, XMMATRIX proj);
 

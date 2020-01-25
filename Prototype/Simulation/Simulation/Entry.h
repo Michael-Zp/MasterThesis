@@ -5,7 +5,6 @@
 #include "Camera.h"
 #include <DirectXMath.h>
 #include "IRenderableItem.h"
-#include "Simulation.h"
 
 using namespace DirectX;
 
@@ -32,7 +31,7 @@ private:
 	XMMATRIX mView;
 	XMMATRIX mProj;
 
-	float mRadius = 5.0f;
+	float mRadius = 20.0f;
 	float mPhi = 0.25f*MathHelper::Pi;
 	float mTheta = 1.5f*MathHelper::Pi;
 

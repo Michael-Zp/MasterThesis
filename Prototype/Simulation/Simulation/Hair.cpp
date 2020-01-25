@@ -50,15 +50,15 @@ Hair::Hair(ID3D11Device *device)
 	HR(device->CreateBuffer(&constantBuffer, NULL, &mConstantBuffer));
 
 
-	mVertexShader = new VertexShader(L"./Shader/hair.hlsl", "HairVS", true);
+	mVertexShader = new VertexShader(L"./Shader/vgpHair.hlsl", "HairVS", true);
 	mVertexShader->addVertexDesc("POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, 0);
 	mVertexShader->addVertexDesc("COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, 0);
 	mVertexShader->prepare(device);
 
-	mGeometryShader = new GeometryShader(L"./Shader/hair.hlsl", "HairGS", true);
+	mGeometryShader = new GeometryShader(L"./Shader/vgpHair.hlsl", "HairGS", true);
 	mGeometryShader->prepare(device);
 
-	mPixelShader = new PixelShader(L"./Shader/hair.hlsl", "HairPS", true);
+	mPixelShader = new PixelShader(L"./Shader/vgpHair.hlsl", "HairPS", true);
 	mPixelShader->prepare(device);
 }
 
@@ -68,7 +68,7 @@ Hair::~Hair()
 
 }
 
-void Hair::Draw(ID3D11DeviceContext *context)
+void Hair::Draw(float deltaTime, ID3D11DeviceContext *context)
 {
 	if (!mIsUpdated)
 	{

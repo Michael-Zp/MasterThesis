@@ -1,0 +1,13 @@
+#########################################################
+#https://doi.org/10.1016/j.mechmachtheory.2009.10.005
+#########################################################
+
+Math is explained in 2.x
+Algorithm is written out in 3.1
+    - Hair split into segments l1, l2, ... , ln and joints (spherical) j1, j2, ... , jn where j1 connects l1 and l2
+    - Algo describes how position of ji-1 can be obtained if the desired Position of ji is known
+    - Use it to recursivly calculate the position from head to tail
+    - If moved in the middle split it into multiple parts and do the algo from there
+
+
+https://doi.org/10.1016/j.mechmachtheory.2013.04.003

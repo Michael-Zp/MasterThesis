@@ -1,14 +1,18 @@
-#include "HairSimulated.h"
+#include "HairSimulatedWithMySimulation.h"
 
 
 
-HairSimulated::HairSimulated(ID3D11Device *device, ID3D11DeviceContext *context)
+HairSimulatedWithMySimulation::HairSimulatedWithMySimulation(ID3D11Device *device, ID3D11DeviceContext *context)
 {
 	std::vector<XMFLOAT3> points;
 	points.push_back(XMFLOAT3(0, 1.25, 0));
-	points.push_back(XMFLOAT3(0, 0, 0));
+	points.push_back(XMFLOAT3(1, .5, 0));
+	points.push_back(XMFLOAT3(0.5, -.5, 0));
+	points.push_back(XMFLOAT3(-0.5, -1.5, 0));
+	points.push_back(XMFLOAT3(0.5, -2.5, 0));
+	points.push_back(XMFLOAT3(-0.5, -3.5, 0));
 
-	mSimulation = new Simulation(points, device, context);
+	mSimulation = new MySimulation(points, device, context);
 
 	mVertexCount = points.size();
 
@@ -23,30 +27,30 @@ HairSimulated::HairSimulated(ID3D11Device *device, ID3D11DeviceContext *context)
 	HR(device->CreateBuffer(&constantBuffer, NULL, &mConstantBuffer));
 
 
-	mVertexShader = new VertexShader(L"./Shader/hairSimulated.hlsl", "HairVS", true);
+	mVertexShader = new VertexShader(L"./Shader/vgpHairSimulated.hlsl", "HairVS", true);
 	mVertexShader->prepare(device);
 
-	mGeometryShader = new GeometryShader(L"./Shader/hairSimulated.hlsl", "HairGS", true);
+	mGeometryShader = new GeometryShader(L"./Shader/vgpHairSimulated.hlsl", "HairGS", true);
 	mGeometryShader->prepare(device);
 
-	mPixelShader = new PixelShader(L"./Shader/hairSimulated.hlsl", "HairPS", true);
+	mPixelShader = new PixelShader(L"./Shader/vgpHairSimulated.hlsl", "HairPS", true);
 	mPixelShader->prepare(device);
 }
 
 
-HairSimulated::~HairSimulated()
+HairSimulatedWithMySimulation::~HairSimulatedWithMySimulation()
 {
 	free(mSimulation);
 }
 
-void HairSimulated::Draw(ID3D11DeviceContext *context)
+void HairSimulatedWithMySimulation::Draw(const float deltaTime, ID3D11DeviceContext *context)
 {
 	if (!mIsUpdated)
 	{
 		DebugBreak();
 	}
 
-	mSimulation->Simulate(context);
+	mSimulation->Simulate(deltaTime, context);
 
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
 
@@ -70,7 +74,7 @@ void HairSimulated::Draw(ID3D11DeviceContext *context)
 	mIsUpdated = false;
 }
 
-void HairSimulated::UpdateCamera(ID3D11DeviceContext *context, XMMATRIX view, XMMATRIX proj)
+void HairSimulatedWithMySimulation::UpdateCamera(ID3D11DeviceContext *context, XMMATRIX view, XMMATRIX proj)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	HR(context->Map(mConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));

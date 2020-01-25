@@ -6,8 +6,10 @@
 #include <iostream>
 #include "HairBase.h"
 #include "Hair.h"
-#include "HairSimulated.h"
-
+#include "HairSimulatedWithMySimulation.h"
+#include "HairSimulatedWithMassSpring.h"
+#include "HairSimulatedWithOneDFlexObj.h"
+#include "HairSimulatedWithTrectrix.h"
 
 Entry::Entry(HINSTANCE hInstance) : D3DApp(hInstance)
 {
@@ -43,7 +45,10 @@ bool Entry::Init()
 	}
 
 	//mRenderableItems.push_back(new Hair(md3dDevice));
-	mRenderableItems.push_back(new HairSimulated(md3dDevice, md3dImmediateContext));
+	//mRenderableItems.push_back(new HairSimulatedWithMySimulation(md3dDevice, md3dImmediateContext));
+	//mRenderableItems.push_back(new HairSimulatedWithMassSpring(md3dDevice, md3dImmediateContext));
+	mRenderableItems.push_back(new HairSimulatedWithOneDFlexObj(md3dDevice, md3dImmediateContext));
+	//mRenderableItems.push_back(new HairSimulatedWithTrectrix(md3dDevice, md3dImmediateContext));
 	mRenderableItems.push_back(new HairBase(md3dDevice));
 
 	return true;
@@ -122,7 +127,7 @@ void Entry::DrawScene()
 	for (int i = 0; i < mRenderableItems.size(); i++)
 	{
 		mRenderableItems[i]->UpdateCamera(md3dImmediateContext, mView, mProj);
-		mRenderableItems[i]->Draw(md3dImmediateContext);
+		mRenderableItems[i]->Draw(mTimer.DeltaTime(), md3dImmediateContext);
 	}
 
 	HR(mSwapChain->Present(0, 0));

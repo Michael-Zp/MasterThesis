@@ -2,15 +2,15 @@
 
 #include "IRenderableItem.h"
 #include "ResetUtils.h"
-#include "Simulation.h"
+#include "MassSpringSimulation.h"
 
-class HairSimulated : public IRenderableItem
+class HairSimulatedWithMassSpring : public IRenderableItem
 {
 public:
-	HairSimulated(ID3D11Device *device, ID3D11DeviceContext *context);
-	~HairSimulated();
+	HairSimulatedWithMassSpring(ID3D11Device *device, ID3D11DeviceContext *context);
+	~HairSimulatedWithMassSpring();
 
-	void Draw(ID3D11DeviceContext *context);
+	void Draw(const float deltaTime, ID3D11DeviceContext *context);
 
 	void UpdateCamera(ID3D11DeviceContext *context, XMMATRIX view, XMMATRIX proj);
 
@@ -23,7 +23,7 @@ private:
 		XMMATRIX proj;
 	};
 
-	Simulation *mSimulation;
+	MassSpringSimulation *mSimulation;
 	HairSimulatedConstantBuffer mConstantBufferData;
 	UINT mVertexCount;
 

@@ -16,158 +16,308 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{e9909033-f762-4abe-99af-276855bb0e17}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Engine">
+      <UniqueIdentifier>{4b1fc5f9-346f-4aeb-9ddd-7b239eb8bb75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine">
+      <UniqueIdentifier>{7df010ae-e498-4e80-a45b-46f649328a2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Simulation">
+      <UniqueIdentifier>{0d5b6407-66c7-4be1-a127-4d920755ad62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Simulation\MySimulation">
+      <UniqueIdentifier>{0cf03924-059c-49e5-9d2a-4b9063a7529b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Simulation\MassSpring">
+      <UniqueIdentifier>{88ceb660-308a-40b4-bfde-d746836f9032}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rendering">
+      <UniqueIdentifier>{5982f996-1e54-48db-a71e-02e758dc00e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rendering\MassSpring">
+      <UniqueIdentifier>{9876466a-f0ae-4cad-87ea-8d1f45f1f0b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rendering\MySimulation">
+      <UniqueIdentifier>{94143895-afb7-4ebb-8796-faa5c69aa957}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rendering">
+      <UniqueIdentifier>{c819ca6b-7f42-4bf2-80a8-e44625567e79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Simulation">
+      <UniqueIdentifier>{456c3fc4-441f-41a4-8537-de9066132b36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rendering\MassSpring">
+      <UniqueIdentifier>{6bb670bd-5a4b-4e5d-9b06-721df428d0d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rendering\MySimulation">
+      <UniqueIdentifier>{4687fffb-1fb7-48ef-bba4-000c1a67acad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Simulation\MassSpring">
+      <UniqueIdentifier>{b3c59b72-6e6a-4603-850f-cc2e954db462}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Simulation\MySimulation">
+      <UniqueIdentifier>{6066549f-dd12-4b81-aac3-32b63a4c9c69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Simulation\1DFlexibleObjects">
+      <UniqueIdentifier>{c2b89572-8151-4257-8054-111f65a86cce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rendering\1DFlexibleObjects">
+      <UniqueIdentifier>{7dfdcc7c-aee8-4390-8b91-a8b45dc5f057}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rendering\1DFlexibleObjects">
+      <UniqueIdentifier>{ed04d4af-69d1-4751-b9fb-8b69c2e4483b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Simulation\1DFlexibleObjects">
+      <UniqueIdentifier>{4c5c6f99-80f2-4325-b0c4-523cf77cd6ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\Shaderclasses">
+      <UniqueIdentifier>{eb6be5a8-ecb7-4d71-b7ec-b619d6b770f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\Utils">
+      <UniqueIdentifier>{fb1f37e6-b4c5-4240-b8e7-4173aed75d08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\Shaderclasses">
+      <UniqueIdentifier>{0044fd2b-ff9f-46c6-ae34-e22534266b8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\Utils">
+      <UniqueIdentifier>{39ba76a3-6799-4398-82d4-e802e3a98800}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\MySimulation">
+      <UniqueIdentifier>{98ac18e9-813b-4437-8d2c-9c6a3f93a8a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\MassSpring">
+      <UniqueIdentifier>{92d6c9bc-1a7c-496e-9cd9-01d94a930b60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\OneDFlexObj">
+      <UniqueIdentifier>{9977c2e2-62b4-40c3-b3dd-00377b77251f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Rest">
+      <UniqueIdentifier>{2be088df-e4a1-4d5f-aea8-3716337eb58b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rendering\1DFlexSplines">
+      <UniqueIdentifier>{97c6d681-2842-451a-ad54-a14af5b0ea90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Simulation\1DFlexSplines">
+      <UniqueIdentifier>{62fcd635-553e-4299-b3a9-d3533bfa3140}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="VertexShader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MeshGenerator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dUtil.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PixelShader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DDSTextureLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LightHelper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MathHelper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GeometryGenerator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dApp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GameTimer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dx11effect.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GeometryShader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IRenderableItem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="HairBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Entry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Hair.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Camera.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dApp.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dUtil.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dx11effect.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="DDSTextureLoader.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="GameTimer.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="GeometryGenerator.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="MathHelper.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="LightHelper.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshGenerator.h">
+      <Filter>Header Files\Engine</Filter>
     </ClInclude>
     <ClInclude Include="ResetUtils.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Engine\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="Simulation.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="IRenderableItem.h">
+      <Filter>Header Files\Engine\Utils</Filter>
     </ClInclude>
     <ClInclude Include="ComputeShader.h">
+      <Filter>Header Files\Engine\Shaderclasses</Filter>
+    </ClInclude>
+    <ClInclude Include="GeometryShader.h">
+      <Filter>Header Files\Engine\Shaderclasses</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexShader.h">
+      <Filter>Header Files\Engine\Shaderclasses</Filter>
+    </ClInclude>
+    <ClInclude Include="PixelShader.h">
+      <Filter>Header Files\Engine\Shaderclasses</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Header Files\Engine\Shaderclasses</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files\Engine\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="MassSpringSimulation.h">
+      <Filter>Header Files\Simulation\MassSpring</Filter>
+    </ClInclude>
+    <ClInclude Include="HairSimulatedWithMassSpring.h">
+      <Filter>Header Files\Rendering\MassSpring</Filter>
+    </ClInclude>
+    <ClInclude Include="HairBase.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Hair.h">
+      <Filter>Header Files\Rendering\MySimulation</Filter>
+    </ClInclude>
+    <ClInclude Include="MySimulation.h">
+      <Filter>Header Files\Simulation\MySimulation</Filter>
+    </ClInclude>
+    <ClInclude Include="HairSimulatedWithMySimulation.h">
+      <Filter>Header Files\Rendering\MySimulation</Filter>
+    </ClInclude>
+    <ClInclude Include="OneDFlexObjSimulation.h">
+      <Filter>Header Files\Simulation\1DFlexibleObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="HairSimulatedWithOneDFlexObj.h">
+      <Filter>Header Files\Rendering\1DFlexibleObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="TractrixSimulation.h">
+      <Filter>Header Files\Simulation\1DFlexibleObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="HairSimulatedWithTrectrix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HairSimulated.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Shader\vgpHairTrectrixSimulated.hlsl">
+      <Filter>Shaders\OneDFlexObj</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="VertexShader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Shader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dApp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PixelShader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dUtil.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DDSTextureLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MathHelper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeometryGenerator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GameTimer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LightHelper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeometryShader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="HairBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Entry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Hair.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dApp.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dUtil.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="DDSTextureLoader.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="GameTimer.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="GeometryGenerator.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="LightHelper.cpp">
+      <Filter>Source Files\Engine</Filter>
     </ClCompile>
     <ClCompile Include="ResetUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Simulation.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Engine\Utils</Filter>
     </ClCompile>
     <ClCompile Include="ComputeShader.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Engine\Shaderclasses</Filter>
     </ClCompile>
-    <ClCompile Include="HairSimulated.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="GeometryShader.cpp">
+      <Filter>Source Files\Engine\Shaderclasses</Filter>
+    </ClCompile>
+    <ClCompile Include="PixelShader.cpp">
+      <Filter>Source Files\Engine\Shaderclasses</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexShader.cpp">
+      <Filter>Source Files\Engine\Shaderclasses</Filter>
+    </ClCompile>
+    <ClCompile Include="MathHelper.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Source Files\Engine\Shaderclasses</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files\Engine\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="HairSimulatedWithMassSpring.cpp">
+      <Filter>Source Files\Rendering\MassSpring</Filter>
+    </ClCompile>
+    <ClCompile Include="HairSimulatedWithMySimulation.cpp">
+      <Filter>Source Files\Rendering\MySimulation</Filter>
+    </ClCompile>
+    <ClCompile Include="HairBase.cpp">
+      <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="MassSpringSimulation.cpp">
+      <Filter>Source Files\Simulation\MassSpring</Filter>
+    </ClCompile>
+    <ClCompile Include="MySimulation.cpp">
+      <Filter>Source Files\Simulation\MySimulation</Filter>
+    </ClCompile>
+    <ClCompile Include="Hair.cpp">
+      <Filter>Source Files\Rendering\MySimulation</Filter>
+    </ClCompile>
+    <ClCompile Include="OneDFlexObjSimulation.cpp">
+      <Filter>Source Files\Simulation\1DFlexibleObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="HairSimulatedWithOneDFlexObj.cpp">
+      <Filter>Source Files\Rendering\1DFlexibleObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="TractrixSimulation.cpp">
+      <Filter>Source Files\Simulation\1DFlexibleObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="HairSimulatedWithTrectrix.cpp">
+      <Filter>Source Files\Rendering\1DFlexibleObjects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shader\hairBase.hlsl">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Shader\hair.hlsl">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Shader\simulation.hlsl">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Shader\hairSimulated.hlsl">
-      <Filter>Shaders</Filter>
+    <None Include="Shader\cSimulation.hlsl">
+      <Filter>Shaders\MySimulation</Filter>
     </None>
     <None Include="Shader\simulationStructs.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Shaders\MySimulation</Filter>
+    </None>
+    <None Include="Shader\vgpHairSimulated.hlsl">
+      <Filter>Shaders\MySimulation</Filter>
+    </None>
+    <None Include="Shader\cMassSpringSimulation.hlsl">
+      <Filter>Shaders\MassSpring</Filter>
+    </None>
+    <None Include="Shader\massSpringProperties.hlsl">
+      <Filter>Shaders\MassSpring</Filter>
+    </None>
+    <None Include="Shader\vgpHairMassSpringSimulated.hlsl">
+      <Filter>Shaders\MassSpring</Filter>
+    </None>
+    <None Include="Shader\cOneDFlexObjSimulation.hlsl">
+      <Filter>Shaders\OneDFlexObj</Filter>
+    </None>
+    <None Include="Shader\oneDFlexObjProperties.hlsl">
+      <Filter>Shaders\OneDFlexObj</Filter>
+    </None>
+    <None Include="Shader\vgpHairOneDFlexObjSimulated.hlsl">
+      <Filter>Shaders\OneDFlexObj</Filter>
+    </None>
+    <None Include="Shader\vgpHair.hlsl">
+      <Filter>Shaders\Rest</Filter>
+    </None>
+    <None Include="Shader\vpHairBase.hlsl">
+      <Filter>Shaders\Rest</Filter>
+    </None>
+    <None Include="Shader\cTractrixRecursiveSimulation.hlsl">
+      <Filter>Shaders\OneDFlexObj</Filter>
+    </None>
+    <None Include="Shader\tractrixProperties.hlsl">
+      <Filter>Shaders\OneDFlexObj</Filter>
+    </None>
+    <None Include="Shader\cOneDFlexObjDifferentialSimulation.hlsl">
+      <Filter>Shaders\OneDFlexObj</Filter>
     </None>
   </ItemGroup>
 </Project>

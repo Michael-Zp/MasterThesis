@@ -162,17 +162,23 @@
     <ClInclude Include="GeometryShader.h" />
     <ClInclude Include="Hair.h" />
     <ClInclude Include="HairBase.h" />
-    <ClInclude Include="HairSimulated.h" />
+    <ClInclude Include="HairSimulatedWithMassSpring.h" />
+    <ClInclude Include="HairSimulatedWithMySimulation.h" />
+    <ClInclude Include="HairSimulatedWithOneDFlexObj.h" />
+    <ClInclude Include="HairSimulatedWithTrectrix.h" />
     <ClInclude Include="LightHelper.h" />
+    <ClInclude Include="MassSpringSimulation.h" />
     <ClInclude Include="MathHelper.h" />
     <ClInclude Include="MeshGenerator.h" />
+    <ClInclude Include="OneDFlexObjSimulation.h" />
     <ClInclude Include="PixelShader.h" />
     <ClInclude Include="IRenderableItem.h" />
     <ClInclude Include="ResetUtils.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Entry.h" />
-    <ClInclude Include="Simulation.h" />
+    <ClInclude Include="MySimulation.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="TractrixSimulation.h" />
     <ClInclude Include="VertexShader.h" />
   </ItemGroup>
   <ItemGroup>
@@ -186,40 +192,134 @@
     <ClCompile Include="GeometryShader.cpp" />
     <ClCompile Include="Hair.cpp" />
     <ClCompile Include="HairBase.cpp" />
-    <ClCompile Include="HairSimulated.cpp" />
+    <ClCompile Include="HairSimulatedWithMassSpring.cpp" />
+    <ClCompile Include="HairSimulatedWithMySimulation.cpp" />
+    <ClCompile Include="HairSimulatedWithOneDFlexObj.cpp" />
+    <ClCompile Include="HairSimulatedWithTrectrix.cpp" />
     <ClCompile Include="LightHelper.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MassSpringSimulation.cpp" />
     <ClCompile Include="MathHelper.cpp" />
+    <ClCompile Include="OneDFlexObjSimulation.cpp" />
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="ResetUtils.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Entry.cpp" />
-    <ClCompile Include="Simulation.cpp" />
+    <ClCompile Include="MySimulation.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="TractrixSimulation.cpp" />
     <ClCompile Include="VertexShader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shader\hair.hlsl">
+    <None Include="Shader\vgpHair.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shader\hairBase.hlsl">
+    <None Include="Shader\vpHairBase.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shader\simulation.hlsl">
+    <None Include="Shader\cSimulation.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shader\hairSimulated.hlsl">
+    <None Include="Shader\vgpHairSimulated.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\simulationStructs.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shader\cMassSpringSimulation.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shader\massSpringProperties.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Shader\vgpHairMassSpringSimulated.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shader\cOneDFlexObjSimulation.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Shader\oneDFlexObjProperties.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Shader\vgpHairOneDFlexObjSimulated.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shader\cTractrixRecursiveSimulation.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Shader\tractrixProperties.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <ClInclude Include="Shader\vgpHairTrectrixSimulated.hlsl">
+      <FileType>Document</FileType>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shader\cOneDFlexObjDifferentialSimulation.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

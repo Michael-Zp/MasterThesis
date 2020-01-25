@@ -9,7 +9,7 @@
 class IRenderableItem
 {
 public:
-	virtual void Draw(ID3D11DeviceContext *context) = 0;
+	virtual void Draw(const float deltaTime, ID3D11DeviceContext *context) = 0;
 	virtual void UpdateCamera(ID3D11DeviceContext *context, XMMATRIX view, XMMATRIX proj) = 0;
 
 protected:

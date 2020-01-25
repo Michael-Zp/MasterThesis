@@ -49,7 +49,14 @@ namespace ResetUtils
 
 	void ResetVertexShaderResources(ID3D11DeviceContext *context)
 	{
-		context->VSSetShaderResources(0, 0, NULL);
+		ID3D11ShaderResourceView* nullSRV[1] = { nullptr };
+		context->VSSetShaderResources(0, 1, nullSRV);
+	}
+
+	void ResetGeometryShaderResources(ID3D11DeviceContext *context)
+	{
+		ID3D11ShaderResourceView* nullSRV[1] = { nullptr };
+		context->GSSetShaderResources(0, 1, nullSRV);
 	}
 
 	void ResetIndexBuffer(ID3D11DeviceContext *context)
@@ -59,8 +66,7 @@ namespace ResetUtils
 
 	void ResetComputeUavBuffer(ID3D11DeviceContext *context)
 	{
-		ID3D11UnorderedAccessView* nullUAV[1];
-		nullUAV[0] = nullptr;
+		ID3D11UnorderedAccessView* nullUAV[1] = { nullptr };
 		context->CSSetUnorderedAccessViews(0, 1, nullUAV, NULL);
 	}
 

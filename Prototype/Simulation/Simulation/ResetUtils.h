@@ -27,6 +27,7 @@ namespace ResetUtils
 
 	void ResetVertexBuffer(ID3D11DeviceContext *context);
 	void ResetVertexShaderResources(ID3D11DeviceContext *context);
+	void ResetGeometryShaderResources(ID3D11DeviceContext *context);
 	void ResetIndexBuffer(ID3D11DeviceContext *context);
 	void ResetComputeUavBuffer(ID3D11DeviceContext *context);
 

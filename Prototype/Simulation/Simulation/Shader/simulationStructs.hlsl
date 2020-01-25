@@ -1,5 +1,8 @@
 struct Particle
 {
     float3 Position;
-    float Parameter;
+    float Size;
+    float3 Velocity;
+    int StrandIdx;
+    float3 DesiredRelativePos;
 };
