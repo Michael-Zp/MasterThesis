@@ -39,12 +39,8 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
 {
     int idx = DTid.x * numThreads.x + DTid.y * numThreads.y + DTid.z * numThreads.z;
     
-    
-    
     int i = strands[idx].NumberOfParticles - 1;
         
-    
-    
     float3 X = strands[idx].Particles[i - 1].Position;
     float3 Xh = strands[idx].Particles[i].Position;
     float3 Xp = float3(sin(totalTime), -1.25 - totalTime * 0.5, 0);
@@ -62,8 +58,6 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
     
     float3 tailVelocityDirection = normalize(normalize(Xp - X) + normalize(Xh - X));
     float3 desiredTailPos = X + tailVelocityDirection * velocityMagnitude * deltaTime;
-    
-    
     
     strands[idx].Particles[i].Position = Xp;
     strands[idx].Particles[i - 1].Position = Xp + normalize(desiredTailPos - Xp) * rodLength;
