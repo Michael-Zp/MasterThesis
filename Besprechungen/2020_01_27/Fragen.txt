@@ -1,0 +1,16 @@
+- Wird es zu viel Simulation + Rendering zu machen, bzw. soll ich mich auf eines konzentrieren.
+  Ich will eigentlich beides machen, da ich finde es ist verbunden.
+  Sind mehrere Forschungsfragen überhaupt ok?
+
+  
+- Da erstes C++/DX project mit shadern. Sollte ich irgendwelche Frameworks (Effects, Boost, o.Ä.) nutzen?
+
+
+- Soll ich bei related work eher allgemeinen Überblick geben (So wird es grob gemacht) oder ein/zwei Beispiele nennen (TressFX, HairWorks)?
+
+
+- Ich glaube es wird schwer für B-Splines zu modeln. Auf jeden Fall schwerer als normale Punkte. Soll ich darauf eingehen oder es einfach am Ende kurz erwähnen.
+  Ich hab noch nicht explizit danach geschaut, aber es wird halt auch nicht verwendet heute.
+
+  
+- 
