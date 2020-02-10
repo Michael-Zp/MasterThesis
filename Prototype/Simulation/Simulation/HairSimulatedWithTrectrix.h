@@ -1,10 +1,11 @@
 #pragma once
 
-#include "IRenderableItem.h"
+#include "RenderItem.h"
 #include "ResetUtils.h"
 #include "TractrixSimulation.h"
+#include "IDrawable.h"
 
-class HairSimulatedWithTrectrix : public IRenderableItem
+class HairSimulatedWithTrectrix : public IDrawable, RenderItem
 {
 public:
 	HairSimulatedWithTrectrix(ID3D11Device *device, ID3D11DeviceContext *context);

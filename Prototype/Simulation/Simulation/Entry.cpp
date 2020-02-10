@@ -10,6 +10,8 @@
 #include "HairSimulatedWithMassSpring.h"
 #include "HairSimulatedWithOneDFlexObj.h"
 #include "HairSimulatedWithTrectrix.h"
+#include "BSpline.h"
+#include "HairSimulatedWithTractixSplines.h"
 
 Entry::Entry(HINSTANCE hInstance) : D3DApp(hInstance)
 {
@@ -44,12 +46,14 @@ bool Entry::Init()
 		return false;
 	}
 
-	//mRenderableItems.push_back(new Hair(md3dDevice));
-	//mRenderableItems.push_back(new HairSimulatedWithMySimulation(md3dDevice, md3dImmediateContext));
-	//mRenderableItems.push_back(new HairSimulatedWithMassSpring(md3dDevice, md3dImmediateContext));
-	mRenderableItems.push_back(new HairSimulatedWithOneDFlexObj(md3dDevice, md3dImmediateContext));
-	//mRenderableItems.push_back(new HairSimulatedWithTrectrix(md3dDevice, md3dImmediateContext));
-	mRenderableItems.push_back(new HairBase(md3dDevice));
+	//mRenderItems.push_back(new Hair(md3dDevice));
+	//mRenderItems.push_back(new HairSimulatedWithMySimulation(md3dDevice, md3dImmediateContext));
+	//mRenderItems.push_back(new HairSimulatedWithMassSpring(md3dDevice, md3dImmediateContext));
+	//mRenderItems.push_back(new HairSimulatedWithOneDFlexObj(md3dDevice, md3dImmediateContext));
+	//mRenderItems.push_back(new HairSimulatedWithTrectrix(md3dDevice, md3dImmediateContext));
+	//mRenderItems.push_back(new BSpline(md3dDevice));
+	mRenderItems.push_back(new HairSimulatedWithTractixSplines(md3dDevice, md3dImmediateContext));
+	mRenderItems.push_back(new HairBase(md3dDevice));
 
 	return true;
 }
@@ -124,10 +128,10 @@ void Entry::DrawScene()
 	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView,
 		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-	for (int i = 0; i < mRenderableItems.size(); i++)
+	for (int i = 0; i < mRenderItems.size(); i++)
 	{
-		mRenderableItems[i]->UpdateCamera(md3dImmediateContext, mView, mProj);
-		mRenderableItems[i]->Draw(mTimer.DeltaTime(), md3dImmediateContext);
+		mRenderItems[i]->UpdateCamera(md3dImmediateContext, mView, mProj);
+		mRenderItems[i]->Draw(mTimer.DeltaTime(), md3dImmediateContext);
 	}
 
 	HR(mSwapChain->Present(0, 0));

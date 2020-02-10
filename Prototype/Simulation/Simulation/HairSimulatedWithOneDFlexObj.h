@@ -1,10 +1,11 @@
 #pragma once
 
-#include "IRenderableItem.h"
+#include "RenderItem.h"
 #include "ResetUtils.h"
 #include "OneDFlexObjSimulation.h"
+#include "IDrawable.h"
 
-class HairSimulatedWithOneDFlexObj : public IRenderableItem
+class HairSimulatedWithOneDFlexObj : public IDrawable, RenderItem
 {
 public:
 	HairSimulatedWithOneDFlexObj(ID3D11Device *device, ID3D11DeviceContext *context);

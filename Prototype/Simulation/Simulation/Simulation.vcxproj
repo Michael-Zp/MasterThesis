@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BSpline.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ComputeShader.h" />
     <ClInclude Include="d3dApp.h" />
@@ -165,23 +166,27 @@
     <ClInclude Include="HairSimulatedWithMassSpring.h" />
     <ClInclude Include="HairSimulatedWithMySimulation.h" />
     <ClInclude Include="HairSimulatedWithOneDFlexObj.h" />
+    <ClInclude Include="HairSimulatedWithTractixSplines.h" />
     <ClInclude Include="HairSimulatedWithTrectrix.h" />
+    <ClInclude Include="IDrawable.h" />
     <ClInclude Include="LightHelper.h" />
     <ClInclude Include="MassSpringSimulation.h" />
     <ClInclude Include="MathHelper.h" />
     <ClInclude Include="MeshGenerator.h" />
     <ClInclude Include="OneDFlexObjSimulation.h" />
     <ClInclude Include="PixelShader.h" />
-    <ClInclude Include="IRenderableItem.h" />
+    <ClInclude Include="RenderItem.h" />
     <ClInclude Include="ResetUtils.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Entry.h" />
     <ClInclude Include="MySimulation.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TractrixSimulation.h" />
+    <ClInclude Include="TractrixSplineSimulation.h" />
     <ClInclude Include="VertexShader.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BSpline.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ComputeShader.cpp" />
     <ClCompile Include="d3dApp.cpp" />
@@ -195,6 +200,7 @@
     <ClCompile Include="HairSimulatedWithMassSpring.cpp" />
     <ClCompile Include="HairSimulatedWithMySimulation.cpp" />
     <ClCompile Include="HairSimulatedWithOneDFlexObj.cpp" />
+    <ClCompile Include="HairSimulatedWithTractixSplines.cpp" />
     <ClCompile Include="HairSimulatedWithTrectrix.cpp" />
     <ClCompile Include="LightHelper.cpp" />
     <ClCompile Include="main.cpp" />
@@ -208,6 +214,7 @@
     <ClCompile Include="MySimulation.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TractrixSimulation.cpp" />
+    <ClCompile Include="TractrixSplineSimulation.cpp" />
     <ClCompile Include="VertexShader.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -320,6 +327,33 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\cOneDFlexObjDifferentialSimulation.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shader\vgpBSpline.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shader\bSplineStructs.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shader\cTractrixSplineSimulation.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Shader\tractrixSplineProperties.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Shader\tractrixSplineStructs.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Shader\vgpTractrixSplinesControlPolygon.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Shader\vgpTractrixSplinesSplines.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

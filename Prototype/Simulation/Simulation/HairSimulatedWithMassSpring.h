@@ -1,10 +1,11 @@
 #pragma once
 
-#include "IRenderableItem.h"
+#include "RenderItem.h"
 #include "ResetUtils.h"
 #include "MassSpringSimulation.h"
+#include "IDrawable.h"
 
-class HairSimulatedWithMassSpring : public IRenderableItem
+class HairSimulatedWithMassSpring : public IDrawable, RenderItem
 {
 public:
 	HairSimulatedWithMassSpring(ID3D11Device *device, ID3D11DeviceContext *context);

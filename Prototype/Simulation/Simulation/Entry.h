@@ -4,7 +4,7 @@
 #include "d3dApp.h"
 #include "Camera.h"
 #include <DirectXMath.h>
-#include "IRenderableItem.h"
+#include "IDrawable.h"
 
 using namespace DirectX;
 
@@ -26,7 +26,7 @@ public:
 
 private:
 
-	std::vector<IRenderableItem*> mRenderableItems;
+	std::vector<IDrawable*> mRenderItems;
 
 	XMMATRIX mView;
 	XMMATRIX mProj;

@@ -1,9 +1,10 @@
 #pragma once
 
-#include "IRenderableItem.h"
+#include "RenderItem.h"
 #include "ResetUtils.h"
+#include "IDrawable.h"
 
-class Hair : public IRenderableItem
+class Hair : public IDrawable, RenderItem
 {
 public:
 	Hair(ID3D11Device *device);

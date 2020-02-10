@@ -5,14 +5,11 @@
 #include "VertexShader.h"
 #include "GeometryShader.h"
 #include "PixelShader.h"
+#include "IDrawable.h"
 
-class IRenderableItem
+class RenderItem
 {
 public:
-	virtual void Draw(const float deltaTime, ID3D11DeviceContext *context) = 0;
-	virtual void UpdateCamera(ID3D11DeviceContext *context, XMMATRIX view, XMMATRIX proj) = 0;
-
-protected:
 	ID3D11Buffer *mVertexBuffer;
 	ID3D11Buffer *mIndexBuffer;
 	ID3D11Buffer *mConstantBuffer;

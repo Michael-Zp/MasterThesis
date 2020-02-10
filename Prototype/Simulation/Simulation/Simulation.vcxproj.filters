@@ -94,11 +94,29 @@
     <Filter Include="Shaders\Rest">
       <UniqueIdentifier>{2be088df-e4a1-4d5f-aea8-3716337eb58b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Rendering\1DFlexSplines">
+    <Filter Include="Header Files\Rendering\BSpline">
+      <UniqueIdentifier>{552f7842-19f5-4330-9b0d-1f06e8e92833}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\BSpline">
+      <UniqueIdentifier>{f6e4055f-d1de-4b9c-8196-02d0f679938e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rendering\BSpline">
       <UniqueIdentifier>{97c6d681-2842-451a-ad54-a14af5b0ea90}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Simulation\1DFlexSplines">
-      <UniqueIdentifier>{62fcd635-553e-4299-b3a9-d3533bfa3140}</UniqueIdentifier>
+    <Filter Include="Header Files\Simulation\TractrixSplines">
+      <UniqueIdentifier>{75d6bf8c-8980-4e34-a88e-6ec0e9b31206}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rendering\TractrixSpines">
+      <UniqueIdentifier>{6aee03cd-58ec-4e72-a377-acae2f751b78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\TractrixSplines">
+      <UniqueIdentifier>{2b2d058c-57ef-42c0-8aa4-53701cd49993}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rendering\TractrixSpines">
+      <UniqueIdentifier>{3d80bd25-0097-4619-8e3a-7e8588a9f92f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Simulation\TractrixSplines">
+      <UniqueIdentifier>{6779a7d0-4be4-468e-9489-8848cd25943d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -136,9 +154,6 @@
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
     <ClInclude Include="ResetUtils.h">
-      <Filter>Header Files\Engine\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="IRenderableItem.h">
       <Filter>Header Files\Engine\Utils</Filter>
     </ClInclude>
     <ClInclude Include="ComputeShader.h">
@@ -186,11 +201,26 @@
     <ClInclude Include="TractrixSimulation.h">
       <Filter>Header Files\Simulation\1DFlexibleObjects</Filter>
     </ClInclude>
-    <ClInclude Include="HairSimulatedWithTrectrix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Shader\vgpHairTrectrixSimulated.hlsl">
       <Filter>Shaders\OneDFlexObj</Filter>
+    </ClInclude>
+    <ClInclude Include="BSpline.h">
+      <Filter>Header Files\Rendering\BSpline</Filter>
+    </ClInclude>
+    <ClInclude Include="HairSimulatedWithTractixSplines.h">
+      <Filter>Header Files\Rendering\TractrixSpines</Filter>
+    </ClInclude>
+    <ClInclude Include="TractrixSplineSimulation.h">
+      <Filter>Header Files\Simulation\TractrixSplines</Filter>
+    </ClInclude>
+    <ClInclude Include="HairSimulatedWithTrectrix.h">
+      <Filter>Header Files\Rendering\1DFlexibleObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="IDrawable.h">
+      <Filter>Header Files\Engine\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderItem.h">
+      <Filter>Header Files\Engine\Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -275,6 +305,15 @@
     <ClCompile Include="HairSimulatedWithTrectrix.cpp">
       <Filter>Source Files\Rendering\1DFlexibleObjects</Filter>
     </ClCompile>
+    <ClCompile Include="BSpline.cpp">
+      <Filter>Source Files\Rendering\BSpline</Filter>
+    </ClCompile>
+    <ClCompile Include="HairSimulatedWithTractixSplines.cpp">
+      <Filter>Source Files\Rendering\TractrixSpines</Filter>
+    </ClCompile>
+    <ClCompile Include="TractrixSplineSimulation.cpp">
+      <Filter>Source Files\Simulation\TractrixSplines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\cSimulation.hlsl">
@@ -318,6 +357,27 @@
     </None>
     <None Include="Shader\cOneDFlexObjDifferentialSimulation.hlsl">
       <Filter>Shaders\OneDFlexObj</Filter>
+    </None>
+    <None Include="Shader\vgpBSpline.hlsl">
+      <Filter>Shaders\BSpline</Filter>
+    </None>
+    <None Include="Shader\bSplineStructs.hlsl">
+      <Filter>Shaders\BSpline</Filter>
+    </None>
+    <None Include="Shader\cTractrixSplineSimulation.hlsl">
+      <Filter>Shaders\TractrixSplines</Filter>
+    </None>
+    <None Include="Shader\tractrixSplineProperties.hlsl">
+      <Filter>Shaders\TractrixSplines</Filter>
+    </None>
+    <None Include="Shader\tractrixSplineStructs.hlsl">
+      <Filter>Shaders\TractrixSplines</Filter>
+    </None>
+    <None Include="Shader\vgpTractrixSplinesControlPolygon.hlsl">
+      <Filter>Shaders\TractrixSplines</Filter>
+    </None>
+    <None Include="Shader\vgpTractrixSplinesSplines.hlsl">
+      <Filter>Shaders\TractrixSplines</Filter>
     </None>
   </ItemGroup>
 </Project>
