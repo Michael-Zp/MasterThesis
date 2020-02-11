@@ -347,9 +347,6 @@
     <None Include="Shader\tractrixSplineProperties.hlsl">
       <FileType>Document</FileType>
     </None>
-    <None Include="Shader\tractrixSplineStructs.hlsl">
-      <FileType>Document</FileType>
-    </None>
     <None Include="Shader\vgpTractrixSplinesControlPolygon.hlsl">
       <FileType>Document</FileType>
     </None>

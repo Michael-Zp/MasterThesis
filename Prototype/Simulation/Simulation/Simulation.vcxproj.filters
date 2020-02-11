@@ -370,9 +370,6 @@
     <None Include="Shader\tractrixSplineProperties.hlsl">
       <Filter>Shaders\TractrixSplines</Filter>
     </None>
-    <None Include="Shader\tractrixSplineStructs.hlsl">
-      <Filter>Shaders\TractrixSplines</Filter>
-    </None>
     <None Include="Shader\vgpTractrixSplinesControlPolygon.hlsl">
       <Filter>Shaders\TractrixSplines</Filter>
     </None>

@@ -1,4 +1,4 @@
-#include "bSplineStructs.hlsl"
+#include "tractrixSplineProperties.hlsl"
 
 cbuffer Camera
 {
@@ -30,7 +30,7 @@ VertexOut HairVS(uint vertexId : SV_VertexID)
     viewProj = transpose(viewProj);
     
     int strandIdx = (int) floor(vertexId / MAX_PARTICLE_COUNT);
-    float3 pos = strands[strandIdx].particles[vertexId].Position;
+    float3 pos = strands[strandIdx].Particles[vertexId].Position;
     
     vout.position = mul(float4(pos, 1.0f), world);
     vout.position = mul(viewProj, vout.position);

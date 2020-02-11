@@ -1,14 +1,15 @@
 struct Particle
 {
     float3 Position;
+    float4 Color;
 };
 
-static const int PARTICLES_IN_STRAND = 16;
+static const int MAX_PARTICLE_COUNT = 16;
 
 struct Strand
 {
-    int NumberOfParticles;
+    int ParticlesCount;
     int StrandIdx;
     float3 DesiredHeadPosition;
-    Particle Particles[16];
+    Particle Particles[MAX_PARTICLE_COUNT];
 };

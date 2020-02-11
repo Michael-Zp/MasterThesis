@@ -4,78 +4,6 @@
 
 void HairSimulatedWithTractixSplines::InitializeSharedBuffers(ID3D11Device * device, ID3D11DeviceContext * context)
 {
-	std::vector<GeometryGenerator::MeshData> meshData;
-	GeometryGenerator generator;
-
-	std::vector<std::vector<XMFLOAT3>> strandPoints;
-	strandPoints.resize(mStrandsCount);
-	strandPoints[0].push_back(XMFLOAT3(0, 1.25, 0));
-	strandPoints[0].push_back(XMFLOAT3(1, 0, 0));
-	strandPoints[0].push_back(XMFLOAT3(0, -1.25, 0));
-	strandPoints[0].push_back(XMFLOAT3(-1, -1.5, 0));
-	strandPoints[0].push_back(XMFLOAT3(1, -2.75, 0));
-	strandPoints[0].push_back(XMFLOAT3(-1, -4.5, 0));
-
-
-	std::vector<Strand> strands;
-
-
-	strands.resize(strandPoints.size());
-	meshData.resize(strandPoints.size());
-	for (int i = 0; i < strandPoints.size(); i++)
-	{
-		generator.CreateLineStrip(strandPoints[i], meshData[i]);
-
-		strands[i].ParticlesCount = strandPoints[i].size();
-
-		for (int k = 0; k < strands[i].ParticlesCount; k++)
-		{
-			strands[i].particles[k] = {
-				meshData[i].Vertices[k].Position,
-				(XMFLOAT4)Colors::Magenta
-			};
-		}
-	}
-
-
-	D3D11_BUFFER_DESC structuredBufferDesc;
-	structuredBufferDesc.ByteWidth = sizeof(Strand) * strands.size();
-	structuredBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	structuredBufferDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
-	structuredBufferDesc.CPUAccessFlags = 0;
-	structuredBufferDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
-	structuredBufferDesc.StructureByteStride = sizeof(Strand);
-
-
-	D3D11_SUBRESOURCE_DATA subData;
-	subData.pSysMem = strands.data();
-
-	HR(device->CreateBuffer(&structuredBufferDesc, &subData, &mStructuredBuffer));
-
-	D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
-	ZeroMemory(&uavDesc, sizeof(uavDesc));
-	uavDesc.Format = DXGI_FORMAT_UNKNOWN;
-	uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
-	uavDesc.Buffer.FirstElement = 0;
-	uavDesc.Buffer.Flags = 0;
-	uavDesc.Buffer.NumElements = strands.size();
-
-	HR(device->CreateUnorderedAccessView(mStructuredBuffer, &uavDesc, &mUAV));
-
-
-	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-	ZeroMemory(&srvDesc, sizeof(srvDesc));
-	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
-	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
-	srvDesc.Buffer.FirstElement = 0;
-	srvDesc.Buffer.ElementOffset = 0;
-	srvDesc.Buffer.ElementWidth = sizeof(Strand);
-	srvDesc.Buffer.NumElements = strands.size();
-
-	HR(device->CreateShaderResourceView(mStructuredBuffer, &srvDesc, &mStrandsSRV));
-
-
-
 	D3D11_BUFFER_DESC cameraCBDesc;
 	ZeroMemory(&cameraCBDesc, sizeof(cameraCBDesc));
 	cameraCBDesc.ByteWidth = sizeof(CameraConstantBuffer);
@@ -105,35 +33,36 @@ void HairSimulatedWithTractixSplines::InitializeSplineRenderItem(ID3D11Device * 
 	D3D11_SUBRESOURCE_DATA splinesSubData;
 	splinesSubData.pSysMem = &cubicSpline;
 
-	HR(device->CreateBuffer(&splinesDesc, &splinesSubData, &splineRenderItem.mConstantBuffer));
+	HR(device->CreateBuffer(&splinesDesc, &splinesSubData, &mSplineRenderItem.mConstantBuffer));
 
 
-	splineRenderItem.mVertexShader = new VertexShader(L"./Shader/vgpTractrixSplinesSplines.hlsl", "HairVS", true);
-	splineRenderItem.mVertexShader->prepare(device);
+	mSplineRenderItem.mVertexShader = new VertexShader(L"./Shader/vgpTractrixSplinesSplines.hlsl", "HairVS", true);
+	mSplineRenderItem.mVertexShader->prepare(device);
 
-	splineRenderItem.mGeometryShader = new GeometryShader(L"./Shader/vgpTractrixSplinesSplines.hlsl", "HairGS", true);
-	splineRenderItem.mGeometryShader->prepare(device);
+	mSplineRenderItem.mGeometryShader = new GeometryShader(L"./Shader/vgpTractrixSplinesSplines.hlsl", "HairGS", true);
+	mSplineRenderItem.mGeometryShader->prepare(device);
 
-	splineRenderItem.mPixelShader = new PixelShader(L"./Shader/vgpTractrixSplinesSplines.hlsl", "HairPS", true);
-	splineRenderItem.mPixelShader->prepare(device);
+	mSplineRenderItem.mPixelShader = new PixelShader(L"./Shader/vgpTractrixSplinesSplines.hlsl", "HairPS", true);
+	mSplineRenderItem.mPixelShader->prepare(device);
 }
 
 void HairSimulatedWithTractixSplines::InitializeControlPolygonRenderItem(ID3D11Device * device, ID3D11DeviceContext * context)
 {
-	controlPolygonRenderItem.mVertexShader = new VertexShader(L"./Shader/vgpTractrixSplinesControlPolygon.hlsl", "HairVS", true);
-	controlPolygonRenderItem.mVertexShader->prepare(device);
+	mControlPolygonRenderItem.mVertexShader = new VertexShader(L"./Shader/vgpTractrixSplinesControlPolygon.hlsl", "HairVS", true);
+	mControlPolygonRenderItem.mVertexShader->prepare(device);
 
-	controlPolygonRenderItem.mGeometryShader = new GeometryShader(L"./Shader/vgpTractrixSplinesControlPolygon.hlsl", "HairGS", true);
-	controlPolygonRenderItem.mGeometryShader->prepare(device);
+	mControlPolygonRenderItem.mGeometryShader = new GeometryShader(L"./Shader/vgpTractrixSplinesControlPolygon.hlsl", "HairGS", true);
+	mControlPolygonRenderItem.mGeometryShader->prepare(device);
 
-	controlPolygonRenderItem.mPixelShader = new PixelShader(L"./Shader/vgpTractrixSplinesControlPolygon.hlsl", "HairPS", true);
-	controlPolygonRenderItem.mPixelShader->prepare(device);
+	mControlPolygonRenderItem.mPixelShader = new PixelShader(L"./Shader/vgpTractrixSplinesControlPolygon.hlsl", "HairPS", true);
+	mControlPolygonRenderItem.mPixelShader->prepare(device);
 }
 
 
 
 HairSimulatedWithTractixSplines::HairSimulatedWithTractixSplines(ID3D11Device *device, ID3D11DeviceContext *context)
 {
+	mSimulation = new TractrixSplineSimulation(device, context);
 	InitializeSharedBuffers(device, context);
 	InitializeSplineRenderItem(device, context);
 	InitializeControlPolygonRenderItem(device, context);
@@ -142,7 +71,7 @@ HairSimulatedWithTractixSplines::HairSimulatedWithTractixSplines(ID3D11Device *d
 
 HairSimulatedWithTractixSplines::~HairSimulatedWithTractixSplines()
 {
-
+	free(mSimulation);
 }
 
 void HairSimulatedWithTractixSplines::Draw(float deltaTime, ID3D11DeviceContext *context)
@@ -152,6 +81,7 @@ void HairSimulatedWithTractixSplines::Draw(float deltaTime, ID3D11DeviceContext 
 		DebugBreak();
 	}
 
+	mSimulation->Simulate(deltaTime, context);
 	DrawSplines(deltaTime, context);
 	DrawControlPolygon(deltaTime, context);
 
@@ -163,17 +93,17 @@ void HairSimulatedWithTractixSplines::DrawSplines(const float deltaTime, ID3D11D
 {
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
 
-	splineRenderItem.mVertexShader->activate(context);
-	splineRenderItem.mGeometryShader->activate(context);
-	splineRenderItem.mPixelShader->activate(context);
+	mSplineRenderItem.mVertexShader->activate(context);
+	mSplineRenderItem.mGeometryShader->activate(context);
+	mSplineRenderItem.mPixelShader->activate(context);
 
-	splineRenderItem.mVertexShader->activateInputLayout(context);
-	context->VSSetShaderResources(0, 1, &mStrandsSRV);
+	mSplineRenderItem.mVertexShader->activateInputLayout(context);
+	context->VSSetShaderResources(0, 1, mSimulation->GetSRVPtr());
 
 	ID3D11Buffer **constBuffers;
 	constBuffers = (ID3D11Buffer**)malloc(sizeof(ID3D11Buffer*) * 2);
 	constBuffers[0] = mCameraCB;
-	constBuffers[1] = splineRenderItem.mConstantBuffer;
+	constBuffers[1] = mSplineRenderItem.mConstantBuffer;
 
 	context->VSSetConstantBuffers(0, 2, constBuffers);
 
@@ -190,12 +120,12 @@ void HairSimulatedWithTractixSplines::DrawControlPolygon(const float deltaTime, 
 {
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
 
-	controlPolygonRenderItem.mVertexShader->activate(context);
-	controlPolygonRenderItem.mGeometryShader->activate(context);
-	controlPolygonRenderItem.mPixelShader->activate(context);
+	mControlPolygonRenderItem.mVertexShader->activate(context);
+	mControlPolygonRenderItem.mGeometryShader->activate(context);
+	mControlPolygonRenderItem.mPixelShader->activate(context);
 
-	controlPolygonRenderItem.mVertexShader->activateInputLayout(context);
-	context->VSSetShaderResources(0, 1, &mStrandsSRV);
+	mControlPolygonRenderItem.mVertexShader->activateInputLayout(context);
+	context->VSSetShaderResources(0, 1, mSimulation->GetSRVPtr());
 
 	ID3D11Buffer **constBuffers;
 	constBuffers = (ID3D11Buffer**)malloc(sizeof(ID3D11Buffer*));
@@ -205,7 +135,7 @@ void HairSimulatedWithTractixSplines::DrawControlPolygon(const float deltaTime, 
 
 	free(constBuffers);
 
-	context->Draw(mStrandsCount * MAX_PARTICLE_COUNT, 0);
+	context->Draw(mSimulation->GetParticlesCount(), 0);
 
 	ResetUtils::ResetShaders(context);
 	ResetUtils::ResetVertexShaderResources(context);

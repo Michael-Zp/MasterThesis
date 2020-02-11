@@ -1,4 +1,4 @@
-#include "oneDFlexObjProperties.hlsl"
+#include "tractrixSplineProperties.hlsl"
 
 cbuffer Time : register(b0)
 {
@@ -35,6 +35,15 @@ float sech(float z)
 }
 
 [numthreads(numThreads.x, numThreads.y, numThreads.z)]
+void SimpleSimulation(uint3 DTid : SV_DispatchThreadID)
+{
+    int idx = DTid.x * numThreads.x + DTid.y * numThreads.y + DTid.z * numThreads.z;
+    
+}
+
+
+
+[numthreads(numThreads.x, numThreads.y, numThreads.z)]
 void Simulation(uint3 DTid : SV_DispatchThreadID)
 {
     int idx = DTid.x * numThreads.x + DTid.y * numThreads.y + DTid.z * numThreads.z;
@@ -63,7 +72,7 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
     (x; y; z)^T = Xh + [R]*(xr; yr; 0)^T
     */
     
-    int i = strands[idx].NumberOfParticles - 1;
+    int i = strands[idx].ParticlesCount - 1;
         
     
     
@@ -79,7 +88,8 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
     //Xp = float3(sin(totalTime), -1.25, 0);
     //Xp = float3(-1, -1.25 - totalTime % (3.1415 * 2), 0);
     //Xp = float3(0, -1.25 - 0.1 * totalTime, sin(totalTime));
-    Xp = float3(cos(totalTime * 0.5), -1.25 - totalTime * 0.5, sin(totalTime * 0.5));
+    //Xp = float3(cos(totalTime * 0.5), -1.25 - totalTime * 0.5, sin(totalTime * 0.5));
+    Xp = float3(-1, -4.5, 0) + float3(sin(totalTime * 0.5), 0, 0);
     
     
     float3 S = Xp - Xh;
@@ -133,7 +143,7 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
     else
     {
         // Adjustment by me. Looks more realistic, if the motion of the head is in the direction of X
-        strands[idx].Particles[i - 1].Color = float3(0, 1, 0);
+        strands[idx].Particles[i - 1].Color = float4(0, 1, 0, 1);
         tempPos = float3(-xr_np_n, yr_n, 0);
     }
     

@@ -1,4 +1,4 @@
-#include "bSplineStructs.hlsl"
+#include "tractrixSplineProperties.hlsl"
 
 cbuffer Camera
 {
@@ -76,10 +76,10 @@ float3 cubicSpline(uint vertexId)
     
     int startJ = clamp(minStartIndex + floor(t), minStartIndex, maxStartIndex);
     
-    float3 p00 = strands[strandIdx].particles[startJ - 3].Position;
-    float3 p10 = strands[strandIdx].particles[startJ - 2].Position;
-    float3 p20 = strands[strandIdx].particles[startJ - 1].Position;
-    float3 p30 = strands[strandIdx].particles[startJ - 0].Position;
+    float3 p00 = strands[strandIdx].Particles[startJ - 3].Position;
+    float3 p10 = strands[strandIdx].Particles[startJ - 2].Position;
+    float3 p20 = strands[strandIdx].Particles[startJ - 1].Position;
+    float3 p30 = strands[strandIdx].Particles[startJ - 0].Position;
     
     float j = max(startJ - 3, 1);
     float rr = 1;

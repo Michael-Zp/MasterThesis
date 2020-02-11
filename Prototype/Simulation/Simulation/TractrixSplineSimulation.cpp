@@ -1,31 +1,56 @@
 #include "TractrixSplineSimulation.h"
 
 #include "ResetUtils.h"
+#include "GeometryGenerator.h"
 
 
-TractrixSplineSimulation::TractrixSplineSimulation(std::vector<std::vector<XMFLOAT3>*> positions, ID3D11Device *device, ID3D11DeviceContext *context)
+TractrixSplineSimulation::TractrixSplineSimulation(ID3D11Device *device, ID3D11DeviceContext *context)
 {
+	std::vector<GeometryGenerator::MeshData> meshData;
+	GeometryGenerator generator;
+
+	std::vector<std::vector<XMFLOAT3>> strandPoints;
+	strandPoints.resize(mStrandsCount);
+	strandPoints[0].push_back(XMFLOAT3(0, 1.25, 0));
+	strandPoints[0].push_back(XMFLOAT3(1, 0, 0));
+	strandPoints[0].push_back(XMFLOAT3(0, -1.25, 0));
+	strandPoints[0].push_back(XMFLOAT3(-1, -1.5, 0));
+	strandPoints[0].push_back(XMFLOAT3(1, -2.75, 0));
+	strandPoints[0].push_back(XMFLOAT3(-1, -4.5, 0));
+
+
+	std::vector<TractrixSplineSimulation::Strand> strands;
+
+
+	strands.resize(strandPoints.size());
+	meshData.resize(strandPoints.size());
+	for (int i = 0; i < strandPoints.size(); i++)
+	{
+		generator.CreateLineStrip(strandPoints[i], meshData[i]);
+
+		strands[i].ParticlesCount = strandPoints[i].size();
+		strands[i].StrandIdx = i;
+		strands[i].DesiredHeadPosition = XMFLOAT3(0, 0, 0);
+
+
+		for (int k = 0; k < strands[i].ParticlesCount; k++)
+		{
+			strands[i].Particles[k] = {
+				meshData[i].Vertices[k].Position,
+				(XMFLOAT4)Colors::Magenta
+			};
+		}
+	}
+
+
 	D3D11_BUFFER_DESC structuredBufferDesc;
-	structuredBufferDesc.ByteWidth = sizeof(Strand) * positions.size();
+	structuredBufferDesc.ByteWidth = sizeof(Strand) * strands.size();
 	structuredBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	structuredBufferDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
 	structuredBufferDesc.CPUAccessFlags = 0;
 	structuredBufferDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
 	structuredBufferDesc.StructureByteStride = sizeof(Strand);
 
-	std::vector<Strand> strands;
-	strands.resize(positions.size());
-	for (int i = 0; i < strands.size(); i++)
-	{
-		strands[i].NumberOfParticles = positions[i]->size();
-		strands[i].StrandIdx = i;
-		strands[i].DesiredHeadPosition = XMFLOAT3(1, -1.25, 0);
-
-		for (int k = 0; k < positions[i]->size(); k++)
-		{
-			strands[i].Particles[k] = { positions[i]->at(k) };
-		}
-	}
 
 	D3D11_SUBRESOURCE_DATA subData;
 	subData.pSysMem = strands.data();
@@ -38,7 +63,7 @@ TractrixSplineSimulation::TractrixSplineSimulation(std::vector<std::vector<XMFLO
 	uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
 	uavDesc.Buffer.FirstElement = 0;
 	uavDesc.Buffer.Flags = 0;
-	uavDesc.Buffer.NumElements = positions.size();
+	uavDesc.Buffer.NumElements = strands.size();
 
 	HR(device->CreateUnorderedAccessView(mStructuredBuffer, &uavDesc, &mUAV));
 
@@ -50,8 +75,7 @@ TractrixSplineSimulation::TractrixSplineSimulation(std::vector<std::vector<XMFLO
 	srvDesc.Buffer.FirstElement = 0;
 	srvDesc.Buffer.ElementOffset = 0;
 	srvDesc.Buffer.ElementWidth = sizeof(Strand);
-	srvDesc.Buffer.NumElements = positions.size();
-
+	srvDesc.Buffer.NumElements = strands.size();
 
 	HR(device->CreateShaderResourceView(mStructuredBuffer, &srvDesc, &mSRV));
 
@@ -69,22 +93,22 @@ TractrixSplineSimulation::TractrixSplineSimulation(std::vector<std::vector<XMFLO
 
 
 
-	D3D11_BUFFER_DESC propertiesConstBuf;
-	propertiesConstBuf.ByteWidth = sizeof(TimeConstBuf);
-	propertiesConstBuf.Usage = D3D11_USAGE_DYNAMIC;
-	propertiesConstBuf.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	propertiesConstBuf.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	propertiesConstBuf.MiscFlags = 0;
-	propertiesConstBuf.StructureByteStride = 0;
+	D3D11_BUFFER_DESC timeConstBufDesc;
+	timeConstBufDesc.ByteWidth = sizeof(TimeConstBuf);
+	timeConstBufDesc.Usage = D3D11_USAGE_DYNAMIC;
+	timeConstBufDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	timeConstBufDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	timeConstBufDesc.MiscFlags = 0;
+	timeConstBufDesc.StructureByteStride = 0;
 
-	PropertiesConstBuf propertiesConstBufData;
-	propertiesConstBufData.drag = 0.9992;
-	propertiesConstBufData.stiffness = 10;
+	TimeConstBuf timeConstBufData;
+	timeConstBufData.DeltaTime = 0;
+	timeConstBufData.TotalTime = 0;
 
-	D3D11_SUBRESOURCE_DATA propertiesSubData;
-	propertiesSubData.pSysMem = &propertiesConstBufData;
+	D3D11_SUBRESOURCE_DATA timeSubData;
+	timeSubData.pSysMem = &timeConstBufData;
 
-	HR(device->CreateBuffer(&propertiesConstBuf, &propertiesSubData, &mPropertiesConstBuf));
+	HR(device->CreateBuffer(&timeConstBufDesc, &timeSubData, &mTimeConstBuf));
 
 
 	mComputeShader = new ComputeShader(L"./Shader/cTractrixSplineSimulation.hlsl", "Simulation", true);
@@ -114,7 +138,6 @@ void TractrixSplineSimulation::Simulate(const float deltaTime, ID3D11DeviceConte
 
 	context->CSSetUnorderedAccessViews(0, 1, &mUAV, NULL);
 	context->CSSetConstantBuffers(ConstBufSlots::TIME_CONST_BUF, 1, &mTimeConstBuf);
-	context->CSSetConstantBuffers(ConstBufSlots::PROPERTIES_CONST_BUF, 1, &mPropertiesConstBuf);
 
 	context->Dispatch(16, 1, 1);
 
