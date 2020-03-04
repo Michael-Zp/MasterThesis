@@ -32,6 +32,20 @@ TractrixSplineSimulation::TractrixSplineSimulation(ID3D11Device *device, ID3D11D
 		strands[i].StrandIdx = i;
 		strands[i].DesiredHeadPosition = XMFLOAT3(0, 0, 0);
 
+		int knotSize = strands[i].ParticlesCount + 4;
+		float maxKnotValue = strands[i].ParticlesCount - 3;
+		for (int j = 0; j < 4; j++)
+		{
+			strands[i].Knot[j] = 0;
+			strands[i].Knot[knotSize - j - 1] = maxKnotValue;
+		}
+
+		for (int j = 0; j < knotSize - 8; j++)
+		{
+			strands[i].Knot[j + 4] = j + 1;
+		}
+
+
 
 		for (int k = 0; k < strands[i].ParticlesCount; k++)
 		{
