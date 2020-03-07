@@ -11,13 +11,33 @@ TractrixSplineSimulation::TractrixSplineSimulation(ID3D11Device *device, ID3D11D
 
 	std::vector<std::vector<XMFLOAT3>> strandPoints;
 	strandPoints.resize(mStrandsCount);
-	strandPoints[0].push_back(XMFLOAT3(0, 1.25, 0));
-	strandPoints[0].push_back(XMFLOAT3(1, 0, 0));
-	strandPoints[0].push_back(XMFLOAT3(0, -1.25, 0));
-	strandPoints[0].push_back(XMFLOAT3(-1, -1.5, 0));
-	strandPoints[0].push_back(XMFLOAT3(1, -2.75, 0));
-	strandPoints[0].push_back(XMFLOAT3(-1, -4.5, 0));
+	//strandPoints[0].push_back(XMFLOAT3(0, 1.25, 0));
+	//strandPoints[0].push_back(XMFLOAT3(1, 0, 0));
+	//strandPoints[0].push_back(XMFLOAT3(0, -1.25, 0));
+	//strandPoints[0].push_back(XMFLOAT3(-1, -1.5, 0));
+	//strandPoints[0].push_back(XMFLOAT3(1, -2.75, 0));
+	//strandPoints[0].push_back(XMFLOAT3(-1, -4.5, 0));
+	//strandPoints[0].push_back(XMFLOAT3(0, -6.5, 0));
 
+	std::vector<XMFLOAT3> myDirections = {
+		XMFLOAT3(0, -1, 0),
+		XMFLOAT3(1, -1, 0),
+		XMFLOAT3(-0.5, -1, 0),
+		XMFLOAT3(1, -1, 0),
+		XMFLOAT3(-2, -1, 0),
+		XMFLOAT3(3, -1, 0)
+	};
+	XMFLOAT3 basePoint(0, 1.25, 0);
+	XMVECTOR currentPoint = XMLoadFloat3(&basePoint);
+	strandPoints[0].push_back(basePoint);
+	for (int i = 0; i < myDirections.size(); i++)
+	{
+		XMVECTOR currDir = XMLoadFloat3(&myDirections[i]);
+		currentPoint += XMVector3Normalize(currDir);
+		XMFLOAT3 tempPoint;
+		XMStoreFloat3(&tempPoint, currentPoint);
+		strandPoints[0].push_back(tempPoint);
+	}
 
 	std::vector<TractrixSplineSimulation::Strand> strands;
 

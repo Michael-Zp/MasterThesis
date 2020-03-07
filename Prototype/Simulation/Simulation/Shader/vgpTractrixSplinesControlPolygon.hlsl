@@ -35,7 +35,7 @@ VertexOut HairVS(uint vertexId : SV_VertexID)
     vout.position = mul(float4(pos, 1.0f), world);
     vout.position = mul(viewProj, vout.position);
     
-    vout.color = strands[strandIdx].Particles[vertexId].Color;
+    vout.color = float4(0, 0, 1, 1);
 
     return vout;
 }

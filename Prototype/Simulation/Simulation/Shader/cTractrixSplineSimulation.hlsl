@@ -169,66 +169,140 @@ void RecursiveTractrix(int idx)
     }
 }
 
-void KnotSubdivisionAndRemoval(int idx)
+void KnotRemoval(int idx, int i, float dotProdL0L1, float dotProdL1L2)
 {
-    for (int i = 1; i < strands[idx].ParticlesCount - 1; i++)
+    float3 l0 = strands[idx].Particles[i].Position - strands[idx].Particles[i - 1].Position;
+    float3 l1 = strands[idx].Particles[i + 1].Position - strands[idx].Particles[i].Position;
+    float3 l2 = strands[idx].Particles[i + 2].Position - strands[idx].Particles[i + 1].Position;
+    
+    float3 p1 = strands[idx].Particles[i - 1].Position;
+    float3 p2 = strands[idx].Particles[i].Position;
+    float3 p3 = strands[idx].Particles[i + 1].Position;
+    float3 p4 = strands[idx].Particles[i + 2].Position;
+    
+    
+    
+    //See menon2016 p.17
+    float3 p1s = p2 + l0 * 0.5;
+    //For p2s:
+    /*
+        All references (like equations) are from menon2016 p.17
+        If given equation 24 and we substitute:
+        p4 = [-L3; 0]
+        p3 = [0; 0]
+        p2 = [L3 * cos(sig2); L3 * sin(sig2)]
+        p1 = [L3 * cos(sig2) - L2 * cos(sig2 + sig1); L3 * sin(sig2) - L3 * sin(sig2 + sig1)]
+        
+        It should be the same, but just using p3 as origin instead of p2, which makes the equation for p2s much simpler.
+    
+        p2s = [1 / 2 * L3; 0]
+    
+        which is very similar to the equation for p1s in eq. 26
+    */
+    float3 p2s = p3 - l2 * 0.5; 
+    
+    
+    float3 newPoint = float3(0, 0, 0);    
+   
+    
+    float originalLenght = length(l0) + length(l1) + length(l2);
+    //Replace with dot if it works as I should not need squared length. Should do the same (dont forget to change originalLength!!)
+    float p1sLength = distance(p1, p1s) + distance(p4, p1s); 
+    float p2sLength = distance(p1, p2s) + distance(p4, p2s);
+    
+    if (abs(p1sLength - originalLenght) > abs(p2sLength - originalLenght))
     {
-        float3 cp0 = strands[idx].Particles[i].Position - strands[idx].Particles[i - 1].Position;
-        float3 cp1 = strands[idx].Particles[i].Position - strands[idx].Particles[i + 1].Position;
+        newPoint = p1s;
+    }
+    else
+    {
+        newPoint = p2s;
+    }
+    
+    for (int j = i + 1; j < strands[idx].ParticlesCount - 1; j++)
+    {
+        strands[idx].Particles[j] = strands[idx].Particles[j + 1];
+    }
+    
+    strands[idx].ParticlesCount--;
+    strands[idx].Particles[i].Position = newPoint;
+    strands[idx].Particles[i].Color = float4(1, 1, 0, 1);
+}
+
+void KnotInsertion(int idx, int i)
+{
+    float3 cp0 = strands[idx].Particles[i].Position - strands[idx].Particles[i - 1].Position;
+    float3 cp1 = strands[idx].Particles[i].Position - strands[idx].Particles[i + 1].Position;
+    
+    float3 p0 = strands[idx].Particles[i - 1].Position;
+    float3 p1 = float3(0, 0, 0);
+    float3 p2 = float3(0, 0, 0);
+    float3 p3 = strands[idx].Particles[i + 1].Position;
+            
+    float lcp0 = length(cp0);
+    float lcp1 = length(cp1);
+            
+            
+    static const float c = 0.25;
+            
+    //Add particle
+    if (lcp0 < lcp1)
+    {
+        p1 = p0 + cp0 * c;
+                
+        p2 = p3 + (normalize(cp1) * (lcp1 - (lcp0 * (1 - c))));
+    }
+    else
+    {
+        p2 = p3 + cp1 * c;
+                
+        p1 = p0 + (normalize(cp0) * (lcp0 - (lcp1 * (1 - c))));
+    }
+            
+            
+    for (int j = strands[idx].ParticlesCount; j > i; j--)
+    {
+        strands[idx].Particles[j] = strands[idx].Particles[j - 1];
+    }
+    strands[idx].ParticlesCount++;
+            
+    strands[idx].Particles[i].Position = p1;
+    strands[idx].Particles[i].Color = float4(0, 1, 0, 1);
+    strands[idx].Particles[i + 1].Position = p2;
+    strands[idx].Particles[i + 1].Color = float4(0, 1, 0, 1);
+}
+
+void KnotInsertionAndRemoval(int idx)
+{
+    float dotProds[MAX_PARTICLE_COUNT - 2];
+    for (int j = 1; j < strands[idx].ParticlesCount - 1; j++)
+    {
+        float3 cp0 = strands[idx].Particles[j].Position - strands[idx].Particles[j - 1].Position;
+        float3 cp1 = strands[idx].Particles[j + 1].Position - strands[idx].Particles[j].Position;
         
         static const float minLength = 0.2;
         if (length(cp0) < minLength || length(cp1) < minLength)
         {
-            continue;
+            dotProds[j - 1] = 0;
         }
         
-        float dotProd = dot(normalize(cp0), normalize(cp1));
-        
-        if (dotProd < KNOT_REMOVAL_THRESHOLD)
+        dotProds[j - 1] = dot(normalize(cp0), normalize(cp1));
+    }
+    
+    for (int i = 0; i < strands[idx].ParticlesCount - 2 && strands[idx].ParticlesCount < MAX_PARTICLE_COUNT; i++)
+    {        
+        if (dotProds[i] < KNOT_INSERTION_THRESHOLD)
         {
-            //Remove particle
+            KnotInsertion(idx, i + 1);
         }
-        else if (dotProd > KNOT_SUBDIVISION_THRESHOLD && strands[idx].ParticlesCount < MAX_PARTICLE_COUNT)
+    }
+    
+    for (int k = 0; k < strands[idx].ParticlesCount - 3 && strands[idx].ParticlesCount > MIN_PARTICLE_COUNT; k++)
+    {
+        if(dotProds[k] > KNOT_REMOVAL_THRESHOLD && dotProds[k + 1] > KNOT_REMOVAL_THRESHOLD)
         {
-            float3 p0 = strands[idx].Particles[i - 1].Position;
-            float3 p1 = float3(0, 0, 0);
-            float3 p2 = float3(0, 0, 0);
-            float3 p3 = strands[idx].Particles[i + 1].Position;
-            
-            float lcp0 = length(cp0);
-            float lcp1 = length(cp1);
-            
-            
-            static const float c = 0.25;
-            
-            //Add particle
-            if (lcp0 < lcp1)
-            {
-                p1 = p0 + cp0 * c;
-                
-                p2 = p3 + (normalize(cp1) * (lcp1 - (lcp0 * (1 - c))));
-            }
-            else
-            {
-                p2 = p3 + cp1 * c;
-                
-                p1 = p0 + (normalize(cp0) * (lcp0 - (lcp1 * (1 - c))));
-            }
-            
-            
-            for (int j = strands[idx].ParticlesCount; j > i; j--)
-            {
-                strands[idx].Particles[j] = strands[idx].Particles[j - 1];
-            }
-            strands[idx].ParticlesCount++;
-            
-            strands[idx].Particles[i].Position = p1;
-            strands[idx].Particles[i].Color = float4(0, 1, 0, 1);
-            strands[idx].Particles[i + 1].Position = p2;
-            strands[idx].Particles[i + 1].Color = float4(0, 1, 0, 1);
+            KnotRemoval(idx, k + 1, dotProds[k], dotProds[k + 1]);
         }
-        
-
     }
 
 }
@@ -241,5 +315,5 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
     
     RecursiveTractrix(idx);
 
-    KnotSubdivisionAndRemoval(idx);
+    //KnotInsertionAndRemoval(idx);
 }

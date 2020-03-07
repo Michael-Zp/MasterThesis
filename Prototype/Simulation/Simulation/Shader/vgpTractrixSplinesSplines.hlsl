@@ -26,97 +26,83 @@ struct GeoOut
     float4 color : COLOR;
 };
 
-float3 cubicSplineInterpolationStep(float3 c0, float3 c1, float t_lower, float t_upper, float t)
+#define getKnot(i) (strands[strandIdx].Knot[i])
+
+// See: https://www.ibiblio.org/e-notes/Splines/basis.html
+float Ni1(int i, float t, int strandIdx)
 {
-    return (t_upper - t) / (t_upper - t_lower) * c0 + (t - t_lower) / (t_upper - t_lower) * c1;
+    return step(getKnot(i), t) * step(t + 1e-5, getKnot(i + 1));
+    //if (t >= getKnot(i) && t < getKnot(i + 1))
+    //    return 1;
+    //else
+    //    return 0;
 }
 
-
-float3 myMultipleCubicSplineInterpolation(float3 c[4], float ts[4], float t)
-{
-    float3 q01 = cubicSplineInterpolationStep(c[0], c[1], ts[0], ts[1], t);
-    float3 q11 = cubicSplineInterpolationStep(c[1], c[2], ts[1], ts[2], t);
-    float3 q21 = cubicSplineInterpolationStep(c[2], c[3], ts[2], ts[3], t);
-    
-    float3 q02 = cubicSplineInterpolationStep(q01, q11, ts[0], ts[2], t);
-    float3 q12 = cubicSplineInterpolationStep(q11, q21, ts[1], ts[2], t);
-    
-    float3 q03 = cubicSplineInterpolationStep(q02, q12, ts[0], ts[3], t);
-    
-    return q03;
-}
-
-float3 cubicSpline(uint vertexId)
+float3 splines(uint vertexId)
 {
     int strandIdx = (int) floor(vertexId / vertexCount);
-    int cubicPartIdx = (int) floor(clamp(((float) vertexId / vertexCount) * strands[strandIdx].ParticlesCount, 0, strands[strandIdx].ParticlesCount - 1));
     
-    float t = (vertexId / vertexCount) * (strands[strandIdx].ParticlesCount - 3);
-    
-    int d = strands[strandIdx].ParticlesCount - 1;
-    
-    
-    int knotSize = strands[strandIdx].ParticlesCount + 4;
-    const static int maxKnotSize = MAX_PARTICLE_COUNT + 4;
-    float knot[maxKnotSize];
     float maxKnotValue = strands[strandIdx].ParticlesCount - 3;
-    for (int i = 0; i < 4; i++)
+    float t = (float(vertexId) / vertexCount) * maxKnotValue;
+    
+    float3 sum = float3(0, 0, 0);
+    int k = 0;
+    int j = 0;
+    int limit = MAX_PARTICLE_COUNT; //Readability in debugger
+    static const float NO_DIVISION_BY_ZERO_GUARD = 1e-5;
+    for (int i = 0; i < limit; i++)
     {
-        knot[i] = 0;
-        knot[knotSize - i - 1] = maxKnotValue;
+        
+        k = 1;
+        j = i;
+        float Nik1 = Ni1(j, t, strandIdx);
+        j = i + 1;
+        float Ni1k1 = Ni1(j, t, strandIdx);
+        j = i + 2;
+        float Ni2k1 = Ni1(j, t, strandIdx);
+        j = i + 3;
+        float Ni3k1 = Ni1(j, t, strandIdx);
+        
+        k = 2;
+        j = i;
+        float Nik2 = Nik1 * (t - getKnot(j)) / (getKnot(j + k - 1) - getKnot(j) + NO_DIVISION_BY_ZERO_GUARD) +
+                Ni1k1 * (getKnot(j + k) - t) / (getKnot(j + k) - getKnot(j + 1) + NO_DIVISION_BY_ZERO_GUARD);
+        j = i + 1;
+        float Ni1k2 = Ni1k1 * (t - getKnot(j)) / (getKnot(j + k - 1) - getKnot(j) + NO_DIVISION_BY_ZERO_GUARD) +
+                Ni2k1 * (getKnot(j + k) - t) / (getKnot(j + k) - getKnot(j + 1) + NO_DIVISION_BY_ZERO_GUARD);
+        j = i + 2;
+        float Ni2k2 = Ni2k1 * (t - getKnot(j)) / (getKnot(j + k - 1) - getKnot(j) + NO_DIVISION_BY_ZERO_GUARD) +
+                Ni3k1 * (getKnot(j + k) - t) / (getKnot(j + k) - getKnot(j + 1) + NO_DIVISION_BY_ZERO_GUARD);
+        
+        k = 3;
+        j = i;
+        float Nik3 = Nik2 * (t - getKnot(j)) / (getKnot(j + k - 1) - getKnot(j) + NO_DIVISION_BY_ZERO_GUARD) +
+                Ni1k2 * (getKnot(j + k) - t) / (getKnot(j + k) - getKnot(j + 1) + NO_DIVISION_BY_ZERO_GUARD);
+        j = i + 1;
+        float Ni1k3 = Ni1k2 * (t - getKnot(j)) / (getKnot(j + k - 1) - getKnot(j) + NO_DIVISION_BY_ZERO_GUARD) +
+                Ni2k2 * (getKnot(j + k) - t) / (getKnot(j + k) - getKnot(j + 1) + NO_DIVISION_BY_ZERO_GUARD);
+        
+        k = 4;
+        j = i;
+        float Nik4 = Nik3 * (t - getKnot(j)) / (getKnot(j + k - 1) - getKnot(j) + NO_DIVISION_BY_ZERO_GUARD) +
+                Ni1k3 * (getKnot(j + k) - t) / (getKnot(j + k) - getKnot(j + 1) + NO_DIVISION_BY_ZERO_GUARD);
+        
+        sum += Nik4 * strands[strandIdx].Particles[i].Position;
     }
     
-    for (i = 0; i < knotSize - 8; i++)
-    {
-        knot[i + 4] = i + 1;
-    }
-    
-    int minStartIndex = 3; //Because the knot is always (0, 0, 0, 0, 1, ...) and 3 is the fourth entry in the knot where knot[i] <= t <= knot[i+1] if 0 < t < 1
-    int maxStartIndex = minStartIndex + knotSize - 8; //Knot is (0,0,0,0,1,..,n,n,n,n) so in what part t is => 3 + knotSize - 4*0s - 4*ns
-    
-    int startJ = clamp(minStartIndex + floor(t), minStartIndex, maxStartIndex);
-    
-    float3 p00 = strands[strandIdx].Particles[startJ - 3].Position;
-    float3 p10 = strands[strandIdx].Particles[startJ - 2].Position;
-    float3 p20 = strands[strandIdx].Particles[startJ - 1].Position;
-    float3 p30 = strands[strandIdx].Particles[startJ - 0].Position;
-    
-    float j = max(startJ - 3, 1);
-    float rr = 1;
-    float3 p11 = (knot[j + d - rr + 1] - t) / (knot[j + d - rr + 1] - knot[j]) * p00 +
-                    (t - knot[j]) / (knot[j + d - rr + 1] - knot[j]) * p10;
-    j++;
-    float3 p21 = (knot[j + d - rr + 1] - t) / (knot[j + d - rr + 1] - knot[j]) * p10 +
-                    (t - knot[j]) / (knot[j + d - rr + 1] - knot[j]) * p20;
-    j++;
-    float3 p31 = (knot[j + d - rr + 1] - t) / (knot[j + d - rr + 1] - knot[j]) * p20 +
-                    (t - knot[j]) / (knot[j + d - rr + 1] - knot[j]) * p30;
-    
-    rr++;
-    j = startJ - 1;
-    float3 p22 = (knot[j + d - rr + 1] - t) / (knot[j + d - rr + 1] - knot[j]) * p11 +
-                    (t - knot[j]) / (knot[j + d - rr + 1] - knot[j]) * p21;
-    j++;
-    float3 p32 = (knot[j + d - rr + 1] - t) / (knot[j + d - rr + 1] - knot[j]) * p21 +
-                    (t - knot[j]) / (knot[j + d - rr + 1] - knot[j]) * p31;
-    
-    
-    rr++;
-    j = startJ;
-    float3 p33 = (knot[j + d - rr + 1] - t) / (knot[j + d - rr + 1] - knot[j]) * p22 +
-                    (t - knot[j]) / (knot[j + d - rr + 1] - knot[j]) * p32;
-    
-    return p33;
+    return sum;
 }
 
-VertexOut HairVS(uint vertexId : SV_VertexID)
+VertexOut
+    HairVS(
+    uint vertexId : SV_VertexID)
 {
     VertexOut vout;
     
     float4x4 viewProj = mul(view, proj);
     viewProj = transpose(viewProj);
     
-    float3 pos = cubicSpline(vertexId);
+    float3 pos = splines(vertexId);
     
     vout.position = mul(float4(pos, 1.0f), world);
     vout.position = mul(viewProj, vout.position);
