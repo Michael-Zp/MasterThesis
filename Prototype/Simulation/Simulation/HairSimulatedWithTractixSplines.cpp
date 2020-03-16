@@ -60,9 +60,9 @@ void HairSimulatedWithTractixSplines::InitializeControlPolygonRenderItem(ID3D11D
 
 
 
-HairSimulatedWithTractixSplines::HairSimulatedWithTractixSplines(ID3D11Device *device, ID3D11DeviceContext *context)
+HairSimulatedWithTractixSplines::HairSimulatedWithTractixSplines(ID3D11Device *device, ID3D11DeviceContext *context, TractrixSplineSimulation::PropertiesConstBuf simulationProperties, XMFLOAT4 strandColor, TractrixSplineSimulation::Configuration config)
 {
-	mSimulation = new TractrixSplineSimulation(device, context);
+	mSimulation = new TractrixSplineSimulation(device, context, simulationProperties, strandColor, config);
 	InitializeSharedBuffers(device, context);
 	InitializeSplineRenderItem(device, context);
 	InitializeControlPolygonRenderItem(device, context);

@@ -31,8 +31,8 @@ private:
 	XMMATRIX mView;
 	XMMATRIX mProj;
 
-	float mRadius = 20.0f;
-	float mPhi = 0.25f*MathHelper::Pi;
+	float mRadius = 5.0f;
+	float mPhi = 0.5f*MathHelper::Pi;
 	float mTheta = 1.5f*MathHelper::Pi;
 
 	POINT mLastMousePos;

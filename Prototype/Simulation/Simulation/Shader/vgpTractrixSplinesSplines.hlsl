@@ -38,19 +38,19 @@ float Ni1(int i, float t, int strandIdx)
     //    return 0;
 }
 
-float3 splines(uint vertexId)
+float3 splines(uint vertexId, uint strandIdx)
 {
-    int strandIdx = (int) floor(vertexId / vertexCount);
-    
     float maxKnotValue = strands[strandIdx].ParticlesCount - 3;
+    maxKnotValue = strands[strandIdx].MaxKnotValue;
     float t = (float(vertexId) / vertexCount) * maxKnotValue;
     
     float3 sum = float3(0, 0, 0);
     int k = 0;
     int j = 0;
-    int limit = MAX_PARTICLE_COUNT; //Readability in debugger
     static const float NO_DIVISION_BY_ZERO_GUARD = 1e-5;
-    for (int i = 0; i < limit; i++)
+    
+    //Is slow af, but it works
+    for (int i = 0; i < MAX_PARTICLE_COUNT; i++)
     {
         
         k = 1;
@@ -93,21 +93,20 @@ float3 splines(uint vertexId)
     return sum;
 }
 
-VertexOut
-    HairVS(
-    uint vertexId : SV_VertexID)
+VertexOut HairVS(uint vertexId : SV_VertexID)
 {
     VertexOut vout;
     
     float4x4 viewProj = mul(view, proj);
     viewProj = transpose(viewProj);
     
-    float3 pos = splines(vertexId);
+    int strandIdx = (int) floor(vertexId / vertexCount);
+    float3 pos = splines(vertexId, strandIdx);
     
     vout.position = mul(float4(pos, 1.0f), world);
     vout.position = mul(viewProj, vout.position);
     
-    vout.color = float4(1, 0, 0, 1);
+    vout.color = strands[strandIdx].Particles[0].Color;
 
     return vout;
 }
@@ -116,29 +115,31 @@ VertexOut
 [maxvertexcount(4)]
 void HairGS(line VertexOut vin[2], inout TriangleStream<GeoOut> gout)
 {
-    float width = 0.1;
+    float width = 0.08;
+    
+    float2 forward = float2(vin[1].position.xy - vin[0].position.xy);
+    float4 side = normalize(float4(-forward.y, forward.x, 0, 0));
     
     GeoOut topLeft;
-    topLeft.position = float4(vin[0].position.x - width, vin[0].position.y, vin[0].position.z, vin[0].position.w);
+    topLeft.position = float4(vin[0].position.x, vin[0].position.y, vin[0].position.z, vin[0].position.w) - side * width;
     topLeft.color = vin[0].color;
     
     GeoOut topRight;
-    topRight.position = float4(vin[0].position.x + width, vin[0].position.y, vin[0].position.z, vin[0].position.w);
+    topRight.position = float4(vin[0].position.x, vin[0].position.y, vin[0].position.z, vin[0].position.w) + side * width;
     topRight.color = vin[0].color;
     
     GeoOut bottomLeft;
-    bottomLeft.position = float4(vin[1].position.x - width, vin[1].position.y, vin[1].position.z, vin[1].position.w);
+    bottomLeft.position = float4(vin[1].position.x, vin[1].position.y, vin[1].position.z, vin[1].position.w) - side * width;
     bottomLeft.color = vin[1].color;
     
     GeoOut bottomRight;
-    bottomRight.position = float4(vin[1].position.x + width, vin[1].position.y, vin[1].position.z, vin[1].position.w);
+    bottomRight.position = float4(vin[1].position.x, vin[1].position.y, vin[1].position.z, vin[1].position.w) + side * width;
     bottomRight.color = vin[1].color;
 
     gout.Append(topRight);
     gout.Append(bottomRight);
     gout.Append(topLeft);
     gout.Append(bottomLeft);
-
 }
 
 

@@ -12,6 +12,7 @@
 #include "HairSimulatedWithTrectrix.h"
 #include "BSpline.h"
 #include "HairSimulatedWithTractixSplines.h"
+#include "TractrixSplineSimulation.h"
 
 Entry::Entry(HINSTANCE hInstance) : D3DApp(hInstance)
 {
@@ -52,7 +53,8 @@ bool Entry::Init()
 	//mRenderItems.push_back(new HairSimulatedWithOneDFlexObj(md3dDevice, md3dImmediateContext));
 	//mRenderItems.push_back(new HairSimulatedWithTrectrix(md3dDevice, md3dImmediateContext));
 	//mRenderItems.push_back(new BSpline(md3dDevice));
-	mRenderItems.push_back(new HairSimulatedWithTractixSplines(md3dDevice, md3dImmediateContext));
+	mRenderItems.push_back(new HairSimulatedWithTractixSplines(md3dDevice, md3dImmediateContext, { true, true, false, true }, (XMFLOAT4)Colors::Magenta, TractrixSplineSimulation::Configuration::Z5Points));
+	mRenderItems.push_back(new HairSimulatedWithTractixSplines(md3dDevice, md3dImmediateContext, { true, false, false, true }, (XMFLOAT4)Colors::Red, TractrixSplineSimulation::Configuration::Z5Points));
 	mRenderItems.push_back(new HairBase(md3dDevice));
 
 	return true;

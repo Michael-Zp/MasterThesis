@@ -9,7 +9,10 @@ cbuffer Time : register(b0)
 
 cbuffer Properties : register(b1)
 {
-    float4 paddingProperties;
+    float doTractrix;
+    float doKnotInsertion;
+    float doKnotRemoval;
+    float stopIfKnotChanged;
 };
 
 static const int3 numThreads = int3(1, 1, 1);
@@ -120,7 +123,7 @@ TractrixStepReturn TractrixStep(float3 tailPos, float3 headPos, float3 desiredHe
 }
 
 
-void RecursiveTractrix(int idx)
+void RecursiveTractrix(int idx, float3 Xp)
 {
     
     
@@ -152,9 +155,7 @@ void RecursiveTractrix(int idx)
     
     float3 X = strands[idx].Particles[tailParticleIdx].Position;
     float3 Xh = strands[idx].Particles[headParticleIdx].Position;
-    float3 Xp = strands[idx].DesiredHeadPosition;
     
-    Xp = float3(-1, -4.5, 0) + float3(5 * sin(totalTime * 0.5), 0, 0);
     
     for (int i = 1; i <= headParticleIdx; i++)
     {
@@ -243,20 +244,28 @@ void KnotInsertion(int idx, int i)
     float lcp1 = length(cp1);
             
             
-    static const float c = 0.25;
+    static const float c = 0.3;
+    static const float d = 0.3;
             
+    
+    //If the knot is inserted at t = 0.66 decide whether to insert the new knot between 0.66 and 1 -> after middle or 0.33 and 0.66 -> before middle
+    float getKnotAfterMiddle = 0.0;
     //Add particle
     if (lcp0 < lcp1)
     {
         p1 = p0 + cp0 * c;
                 
-        p2 = p3 + (normalize(cp1) * (lcp1 - (lcp0 * (1 - c))));
+        //p2 = p3 + (normalize(cp1) * (lcp1 - (lcp0 * (1 - c))));
+        p2 = p3 + (normalize(cp1) * (lcp1 - (lcp0 * d)));
+
     }
     else
     {
         p2 = p3 + cp1 * c;
                 
-        p1 = p0 + (normalize(cp0) * (lcp0 - (lcp1 * (1 - c))));
+        //p1 = p0 + (normalize(cp0) * (lcp0 - (lcp1 * (1 - c))));
+        p1 = p0 + (normalize(cp0) * (lcp0 - (lcp1 * d)));
+        getKnotAfterMiddle = 1.0;
     }
             
             
@@ -267,9 +276,100 @@ void KnotInsertion(int idx, int i)
     strands[idx].ParticlesCount++;
             
     strands[idx].Particles[i].Position = p1;
-    strands[idx].Particles[i].Color = float4(0, 1, 0, 1);
     strands[idx].Particles[i + 1].Position = p2;
-    strands[idx].Particles[i + 1].Color = float4(0, 1, 0, 1);
+    
+    
+    float myKnotValue = strands[idx].KnotValues[i];
+    
+    
+    //if (getKnotAfterMiddle)
+    //{
+    //    otherKnotValue = strands[idx].KnotValues[i + 1];
+    //}
+    //else
+    //{
+    //    otherKnotValue = strands[idx].KnotValues[i - 1];
+    //}
+    float otherKnotValue = strands[idx].KnotValues[i - 1 + step(0.5, getKnotAfterMiddle) * 2];
+    float newKnotValue = (myKnotValue + otherKnotValue) / 2;
+    
+    
+    //bool foundSomething = false;
+    //for (int u = MAX_KNOT_SIZE - 2; u >= 0; u--)
+    //{
+    //    if (strands[idx].Knot[i] > 0)
+    //    {
+    //        foundSomething = true;
+    //    }
+        
+    //    if(foundSomething)
+    //    {
+    //        if (newKnotValue < strands[idx].Knot[i])
+    //        {
+    //            strands[idx].Knot[i + 1] = strands[idx].Knot[i];
+    //        }
+    //        else
+    //        {
+    //            strands[idx].Knot[i + 1] = newKnotValue;
+    //            break;
+    //        }
+    //    }
+    //}
+    float foundSomething = 0.0;
+    float theOlSwitcheroooHappened = 0.0;
+    for (int u = MAX_KNOT_SIZE - 2; u >= 0; u--)
+    {
+        foundSomething = step(0.5, foundSomething + step(0.5, strands[idx].Knot[u]));
+        float isBigger = step(newKnotValue, strands[idx].Knot[u]);
+        
+        //if (foundSomething)
+        //{
+        //    if (!theOlSwitcheroooHappened)
+        //    {
+        //        if (isBigger)
+        //        {
+        //            strands[idx].Knot[u + 1] = strands[idx].Knot[u];
+        //        }
+        //        else
+        //        {
+        //            strands[idx].Knot[u + 1] = newKnotValue;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        strands[idx].Knot[u + 1] = strands[idx].Knot[u + 1];
+        //    }
+        //}
+        //else
+        //{
+        //    strands[idx].Knot[u + 1] = strands[idx].Knot[u + 1];
+        //}
+        
+        strands[idx].Knot[u + 1] = (1 - foundSomething) * strands[idx].Knot[u + 1] +
+                                        foundSomething * (1 - theOlSwitcheroooHappened) * isBigger * strands[idx].Knot[u] +
+                                        foundSomething * (1 - theOlSwitcheroooHappened) * (1 - isBigger) * newKnotValue +
+                                        foundSomething * theOlSwitcheroooHappened * strands[idx].Knot[u + 1];
+        
+        
+        theOlSwitcheroooHappened = step(0.5, theOlSwitcheroooHappened + foundSomething * (1 - isBigger));
+    }
+    
+    //Same thing as above just with KnotValues instead of Knot. Yes they will differ at some point
+    foundSomething = 0.0;
+    theOlSwitcheroooHappened = 0.0;
+    for (u = MAX_KNOT_SIZE - 2; u >= 0; u--)
+    {
+        foundSomething = step(0.5, foundSomething + step(0.5, strands[idx].KnotValues[u]));
+        float isBigger = step(newKnotValue, strands[idx].KnotValues[u]);
+        
+        strands[idx].KnotValues[u + 1] = (1 - foundSomething) * strands[idx].KnotValues[u + 1] +
+                                        foundSomething * (1 - theOlSwitcheroooHappened) * isBigger * strands[idx].KnotValues[u] +
+                                        foundSomething * (1 - theOlSwitcheroooHappened) * (1 - isBigger) * newKnotValue +
+                                        foundSomething * theOlSwitcheroooHappened * strands[idx].KnotValues[u + 1];
+        
+        
+        theOlSwitcheroooHappened = step(0.5, theOlSwitcheroooHappened + foundSomething * (1 - isBigger));
+    }
 }
 
 void KnotInsertionAndRemoval(int idx)
@@ -290,21 +390,28 @@ void KnotInsertionAndRemoval(int idx)
     }
     
     for (int i = 0; i < strands[idx].ParticlesCount - 2 && strands[idx].ParticlesCount < MAX_PARTICLE_COUNT; i++)
-    {        
+    {
         if (dotProds[i] < KNOT_INSERTION_THRESHOLD)
         {
-            KnotInsertion(idx, i + 1);
+            if (doKnotInsertion)
+            {
+                KnotInsertion(idx, i + 1);
+            }
+            strands[idx].KnotHasChangedOnce = 1.0;
         }
     }
     
     for (int k = 0; k < strands[idx].ParticlesCount - 3 && strands[idx].ParticlesCount > MIN_PARTICLE_COUNT; k++)
     {
-        if(dotProds[k] > KNOT_REMOVAL_THRESHOLD && dotProds[k + 1] > KNOT_REMOVAL_THRESHOLD)
+        if (dotProds[k] > KNOT_REMOVAL_THRESHOLD && dotProds[k + 1] > KNOT_REMOVAL_THRESHOLD)
         {
-            KnotRemoval(idx, k + 1, dotProds[k], dotProds[k + 1]);
+            if (doKnotRemoval)
+            {
+                KnotRemoval(idx, k + 1, dotProds[k], dotProds[k + 1]);
+            }
+            strands[idx].KnotHasChangedOnce = 1.0;
         }
     }
-
 }
 
 
@@ -313,7 +420,14 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
 {
     int idx = DTid.x * numThreads.x + DTid.y * numThreads.y + DTid.z * numThreads.z;
     
-    RecursiveTractrix(idx);
+    float3 Xp = strands[idx].OriginalHeadPosition;
+    //Xp = float3(-1, -4.5, 0) + float3(5 * sin(totalTime * 0.5), 0, 0);
+    Xp = strands[idx].OriginalHeadPosition + strands[idx].DesiredHeadMovement * min(totalTime * 0.25, 1); //Test position for KnotInsertionTest (see TractrixSplineSimulation.cpp)
+    
+    if (doTractrix && !(stopIfKnotChanged && strands[idx].KnotHasChangedOnce))
+    {
+        RecursiveTractrix(idx, Xp);
+    }
 
-    //KnotInsertionAndRemoval(idx);
+    KnotInsertionAndRemoval(idx);
 }

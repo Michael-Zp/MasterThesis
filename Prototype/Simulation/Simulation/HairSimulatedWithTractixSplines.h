@@ -9,7 +9,7 @@
 class HairSimulatedWithTractixSplines : public IDrawable
 {
 public:
-	HairSimulatedWithTractixSplines(ID3D11Device *device, ID3D11DeviceContext *context);
+	HairSimulatedWithTractixSplines(ID3D11Device *device, ID3D11DeviceContext *context, TractrixSplineSimulation::PropertiesConstBuf simulationProps, XMFLOAT4 strandColor, TractrixSplineSimulation::Configuration config);
 	~HairSimulatedWithTractixSplines();
 
 	void Draw(float deltaTime, ID3D11DeviceContext *context);
