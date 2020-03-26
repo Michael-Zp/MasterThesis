@@ -32,6 +32,7 @@ TractrixSplineSimulation::TractrixSplineSimulation(ID3D11Device *device, ID3D11D
 	switch (config)
 	{
 		case TractrixSplineSimulation::Configuration::Z4Points:
+		case TractrixSplineSimulation::Configuration::Z4PointsStretch:
 			myDirections = {
 				XMFLOAT3(0, -1, 0),
 				XMFLOAT3(1, 0, 0),
@@ -46,6 +47,7 @@ TractrixSplineSimulation::TractrixSplineSimulation(ID3D11Device *device, ID3D11D
 			};
 			break;
 		case TractrixSplineSimulation::Configuration::Z5Points:
+		case TractrixSplineSimulation::Configuration::Z5PointsStretch:
 			myDirections = {
 				XMFLOAT3(0, -1, 0),
 				XMFLOAT3(1, 0, 0),
@@ -97,16 +99,21 @@ TractrixSplineSimulation::TractrixSplineSimulation(ID3D11Device *device, ID3D11D
 		switch (config)
 		{
 			case TractrixSplineSimulation::Configuration::Z4Points:
-				strands[i].DesiredHeadMovement = XMFLOAT3(-1, 0.7, 0);
-				break;
 			case TractrixSplineSimulation::Configuration::ZReverse4Points:
 				strands[i].DesiredHeadMovement = XMFLOAT3(-1, 0.7, 0);
 				break;
+			case TractrixSplineSimulation::Configuration::Z4PointsStretch:
+				strands[i].DesiredHeadMovement = XMFLOAT3(1, -0.7, 0);
+				break;
+
 			case TractrixSplineSimulation::Configuration::Z5Points:
 				strands[i].DesiredHeadMovement = XMFLOAT3(0.7, 2.5, 0);
 				break;
 			case TractrixSplineSimulation::Configuration::ZReverse5Points:
 				strands[i].DesiredHeadMovement = XMFLOAT3(-1, 0.7, 0);
+				break;
+			case TractrixSplineSimulation::Configuration::Z5PointsStretch:
+				strands[i].DesiredHeadMovement = XMFLOAT3(1, -1.7, 0);
 				break;
 			default:
 				strands[i].DesiredHeadMovement = XMFLOAT3(-1, 0.7, 0);

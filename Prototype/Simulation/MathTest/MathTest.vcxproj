@@ -125,12 +125,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AngularSpringsWithQuaternions.cpp" />
+    <ClCompile Include="KnotRemoval.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PrintHelper.cpp" />
     <ClCompile Include="Tractrix.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AngularSpringsWithQuaternions.h" />
+    <ClInclude Include="KnotRemoval.h" />
     <ClInclude Include="PrintHelper.h" />
     <ClInclude Include="Tractrix.h" />
   </ItemGroup>

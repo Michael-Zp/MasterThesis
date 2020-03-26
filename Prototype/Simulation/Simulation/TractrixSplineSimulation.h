@@ -61,8 +61,10 @@ public:
 	{
 		Z4Points,
 		ZReverse4Points,
+		Z4PointsStretch,
 		Z5Points,
-		ZReverse5Points
+		ZReverse5Points,
+		Z5PointsStretch
 	};
 
 	TractrixSplineSimulation(ID3D11Device *device, ID3D11DeviceContext *context, PropertiesConstBuf props, XMFLOAT4 strandColor, Configuration config);

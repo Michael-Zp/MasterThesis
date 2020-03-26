@@ -1,0 +1,9 @@
+Simulation:
+
+- I wont use Knot removal:
+    - I is prone to create long control polygons which hinders the movement by tractrix simulation.
+    - The results just dont look good and I can control the control polygons enough with just knot insertion.
+    - Yes it has a performance impact, but it should be fine I think.
+    - What to do?
+        -> Keep it in the program and show results with and without it.
+    - Ok I fucked the implementation up, it looks ok now ^^
