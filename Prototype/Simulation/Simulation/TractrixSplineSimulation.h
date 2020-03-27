@@ -48,6 +48,7 @@ public:
 	{
 		int ParticlesCount;
 		int StrandIdx;
+		XMFLOAT3 HairRoot;
 		XMFLOAT3 DesiredHeadMovement;
 		XMFLOAT3 OriginalHeadPosition;
 		Particle Particles[MAX_PARTICLE_COUNT];

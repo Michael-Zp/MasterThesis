@@ -120,6 +120,7 @@ TractrixSplineSimulation::TractrixSplineSimulation(ID3D11Device *device, ID3D11D
 				break;
 		}
 
+		strands[i].HairRoot = strandPoints[i][0];
 		strands[i].OriginalHeadPosition = strandPoints[i][strandPoints[i].size() - 1];
 		strands[i].KnotHasChangedOnce = 0.0;
 

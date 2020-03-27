@@ -123,7 +123,7 @@ TractrixStepReturn TractrixStep(float3 tailPos, float3 headPos, float3 desiredHe
 }
 
 
-void RecursiveTractrix(int idx, float3 Xp)
+void RecursiveTractrix(int idx, float3 Xp, float reverse)
 {
     
     
@@ -149,24 +149,27 @@ void RecursiveTractrix(int idx, float3 Xp)
     (x; y; z)^T = Xh + [R]*(xr; yr; 0)^T
     */
     
-    int headParticleIdx = strands[idx].ParticlesCount - 1;
-    int tailParticleIdx = headParticleIdx - 1;
+    reverse = step(0.5, reverse); //Normalize reverse
+    
+    float dir = ((1 - reverse) * -1) + (reverse * 1);
+    int headParticleIdx = (1 - reverse) * (strands[idx].ParticlesCount - 1); // + reverse * 0;
+    int tailParticleIdx = headParticleIdx + dir;
     
     
     float3 X = strands[idx].Particles[tailParticleIdx].Position;
     float3 Xh = strands[idx].Particles[headParticleIdx].Position;
     
     
-    for (int i = 1; i <= headParticleIdx; i++)
+    for (int i = 1; i <= strands[idx].ParticlesCount - 1; i++)
     {
         TractrixStepReturn tractrixResult = TractrixStep(X, Xh, Xp);
 
-        X = strands[idx].Particles[tailParticleIdx - i].Position;
-        Xh = strands[idx].Particles[headParticleIdx - i].Position;
+        X = strands[idx].Particles[tailParticleIdx + i * dir].Position;
+        Xh = strands[idx].Particles[headParticleIdx + i * dir].Position;
         Xp = tractrixResult.NewTailPos;
         
-        strands[idx].Particles[tailParticleIdx - i + 1].Position = tractrixResult.NewTailPos;
-        strands[idx].Particles[headParticleIdx - i + 1].Position = tractrixResult.NewHeadPos;
+        strands[idx].Particles[tailParticleIdx + i * dir - dir].Position = tractrixResult.NewTailPos;
+        strands[idx].Particles[headParticleIdx + i * dir - dir].Position = tractrixResult.NewHeadPos;
     }
 }
 
@@ -496,7 +499,9 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
     
     if (doTractrix && !(stopIfKnotChanged && strands[idx].KnotHasChangedOnce))
     {
-        RecursiveTractrix(idx, Xp);
+        RecursiveTractrix(idx, Xp, 0.0);
+        RecursiveTractrix(idx, strands[idx].HairRoot, 1.0);
+
     }
 
     KnotInsertionAndRemoval(idx);
