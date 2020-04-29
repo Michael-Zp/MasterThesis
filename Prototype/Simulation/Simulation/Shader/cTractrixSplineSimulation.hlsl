@@ -107,9 +107,7 @@ TractrixStepReturn TractrixStep(float3 tailPos, float3 headPos, float3 desiredHe
     //Otherwise cross(S, T) = float3(0, 0, 0) and this is not good.
     //If they just pull it straight the tail should follow exactly the same
     float3 crossST = normalize(cross(S, T));
-    //if (floatEqual(crossST, float3(0, 0, 0), 0.0001))
     if (isnan(crossST.x) && isnan(crossST.y) && isnan(crossST.z))
-    //if (true)
     {
         ret.NewHeadPos = desiredHeadPos;
         ret.NewTailPos = desiredHeadPos - (headPos - tailPos);
@@ -165,14 +163,17 @@ TractrixStepReturn TractrixStep(float3 tailPos, float3 headPos, float3 desiredHe
         
         if (length(newTailPos - tailPos) < length(desiredHeadPos - headPos))
         {
-        // I donLt have infinite precision and sechInv -> infinity if x -> 0 so yeah... should prevent these ehm irregularities (basically everything just fucks up)
-        // Additionaly it is mathematically correct, because in a tractrix the movement of the tail has to be smaller than the movement of the head (thats the whole point of this thing)
+            // I don´t have infinite precision and sechInv -> infinity if x -> 0 so yeah... should prevent these ehm irregularities (basically everything just fucks up)
+            // Additionaly it is mathematically correct, because in a tractrix the movement of the tail has to be smaller than the movement of the head (thats the whole point of this thing)
             ret.NewTailPos = headPos + mul(tempPos, R);
             ret.NewHeadPos = desiredHeadPos;
             strands[0].Particles[0].Color = float4(0, 1, 0, 1);
         }
         else
         {
+            //If the calculation fails, just set the head to the desiredHeadPos and 
+            //pull the tail along the control polygon. This will prevent weird cases when in which
+            //the tail will follow the exact same movement as the head (like a z falling straight down instead of flexing)
             strands[0].Particles[0].Color = float4(0, 0, 1, 1);
             ret.NewHeadPos = desiredHeadPos;
             ret.NewTailPos = tailPos + (headPos - tailPos) * length(desiredHeadPos - headPos);
