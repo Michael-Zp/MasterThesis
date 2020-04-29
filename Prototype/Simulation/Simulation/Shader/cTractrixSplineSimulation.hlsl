@@ -13,6 +13,8 @@ cbuffer Properties : register(b1)
     float doKnotInsertion;
     float doKnotRemoval;
     float stopIfKnotChanged;
+    float usePhysics;
+    float3 padding;
 };
 
 static const int3 numThreads = int3(1, 1, 1);
@@ -50,6 +52,40 @@ struct TractrixStepReturn
     float3 NewHeadPos;
 };
 
+bool floatEqual(float a, float b, float epsilon)
+{
+    float sVal = a - epsilon;
+    float lVal = a + epsilon;
+    bool smaller = sVal < b;
+    bool larger = lVal > b;
+    return smaller && larger;
+}
+
+bool floatEqual(float3 a, float3 b, float3 epsilon)
+{
+    return floatEqual(a.x, b.x, epsilon.x) && floatEqual(a.y, b.y, epsilon.y) && floatEqual(a.z, b.z, epsilon.z);
+}
+
+bool floatEqual(float3 a, float3 b, float epsilon)
+{
+    bool x = floatEqual(a.x, b.x, epsilon);
+    bool y = floatEqual(a.y, b.y, epsilon);
+    bool z = floatEqual(a.z, b.z, epsilon);
+    return x && y && z;
+}
+
+bool floatEqual(float2 a, float2 b, float2 epsilon)
+{
+    return floatEqual(a.x, b.x, epsilon.x) && floatEqual(a.y, b.y, epsilon.y);
+}
+
+bool floatEqual(float2 a, float2 b, float epsilon)
+{
+    return floatEqual(a.x, b.x, epsilon) && floatEqual(a.y, b.y, epsilon);
+}
+
+#define fEq(a, b, e) (((a - e) < b) && ((a + e) > b))
+
 TractrixStepReturn TractrixStep(float3 tailPos, float3 headPos, float3 desiredHeadPos)
 {
     TractrixStepReturn ret;
@@ -64,59 +100,85 @@ TractrixStepReturn TractrixStep(float3 tailPos, float3 headPos, float3 desiredHe
     
     float3 T = tailPos - headPos;
         
-    float3 Xr = normalize(S);
-        
-    float3 Zr = normalize(cross(S, T));
-        
-    float3 Yr = cross(Zr, Xr);
-       
     
-    float3x3 R = float3x3(Xr.x, Xr.y, Xr.z, Yr.x, Yr.y, Yr.z, Zr.x, Zr.y, Zr.z);
-        
-    float y = dot(Yr, T);
-
-    
-    float p_p = L * sechInv(y / L) + lengthS;
-    float p_n = L * sechInv(y / L) - lengthS;
-    
-    //Prevent stuff from jumping to harsh, because sechInv -> infinity if x -> 0
-    p_p = clamp(p_p, -100, 100);
-    
-    float xr_p = +lengthS - L * tanh(p_p / L);
-    float xr_n = -lengthS - L * tanh(p_p / L);
-    
-    float xr_np_p = +lengthS - L * tanh(p_n / L);
-    float xr_np_n = -lengthS - L * tanh(p_n / L);
-    
-    float yr_p = L * sech(p_p / L);
-    float yr_n = L * sech(p_n / L);
-        
-    
-    float3 tempPos = float3(xr_p, yr_p, 0);
-    
-    
-
-    if (length(tailPos - desiredHeadPos) > length(tailPos - headPos))  // Replacable by 'dot(normalize(T), normalize(S)) < 0' [for performance, because length of S and T might be used elsewhere too]
+    //TODO See if this still a bug
+    //See if they are linear independent, if cross == (0, 0, 0) they are not
+    //If they are linear dependent, just add some stuff on T to get a correct coordinate system 
+    //Otherwise cross(S, T) = float3(0, 0, 0) and this is not good.
+    //If they just pull it straight the tail should follow exactly the same
+    float3 crossST = normalize(cross(S, T));
+    //if (floatEqual(crossST, float3(0, 0, 0), 0.0001))
+    if (isnan(crossST.x) && isnan(crossST.y) && isnan(crossST.z))
+    //if (true)
     {
-        tempPos = float3(xr_p, yr_p, 0);
+        ret.NewHeadPos = desiredHeadPos;
+        ret.NewTailPos = desiredHeadPos - (headPos - tailPos);
+        strands[0].Particles[0].Color = float4(1, 0, 0, 1);
     }
     else
     {
-        // Adjustment by me. Looks more realistic, if the motion of the head is in the direction of X
-        tempPos = float3(-xr_np_n, yr_n, 0);
-    }
+        float3 Xr = normalize(S);
+        
+        float3 Zr = normalize(cross(S, T));
+        
+        float3 Yr = cross(Zr, Xr);
+       
+    
+        float3x3 R = float3x3(Xr.x, Xr.y, Xr.z, Yr.x, Yr.y, Yr.z, Zr.x, Zr.y, Zr.z);
+        
+        float y = dot(Yr, T);
+
+    
+        float p_p = L * sechInv(y / L) + lengthS;
+        float p_n = L * sechInv(y / L) - lengthS;
+    
+    //Prevent stuff from jumping to harsh, because sechInv -> infinity if x -> 0
+        p_p = clamp(p_p, -100, 100);
+    
+        float xr_p = +lengthS - L * tanh(p_p / L);
+        float xr_n = -lengthS - L * tanh(p_p / L);
+    
+        float xr_np_p = +lengthS - L * tanh(p_n / L);
+        float xr_np_n = -lengthS - L * tanh(p_n / L);
+    
+        float yr_p = L * sech(p_p / L);
+        float yr_n = L * sech(p_n / L);
+        
+    
+        float3 tempPos = float3(xr_p, yr_p, 0);
     
     
-    ret.NewHeadPos = desiredHeadPos;
+
+        if (length(tailPos - desiredHeadPos) > length(tailPos - headPos))  // Replacable by 'dot(normalize(T), normalize(S)) < 0' [for performance, because length of S and T might be used elsewhere too]
+        {
+            tempPos = float3(xr_p, yr_p, 0);
+        }
+        else
+        {
+    // Adjustment by me. Looks more realistic, if the motion of the head is in the direction of X
+            tempPos = float3(-xr_np_n, yr_n, 0);
+        }
+    
+    
         
-    float3 newTailPos = headPos + mul(tempPos, R);
+        float3 newTailPos = headPos + mul(tempPos, R);
         
-    if (length(newTailPos - tailPos) < length(desiredHeadPos - headPos))
-    {
+        if (length(newTailPos - tailPos) < length(desiredHeadPos - headPos))
+        {
         // I donLt have infinite precision and sechInv -> infinity if x -> 0 so yeah... should prevent these ehm irregularities (basically everything just fucks up)
         // Additionaly it is mathematically correct, because in a tractrix the movement of the tail has to be smaller than the movement of the head (thats the whole point of this thing)
-        ret.NewTailPos = headPos + mul(tempPos, R);
+            ret.NewTailPos = headPos + mul(tempPos, R);
+            ret.NewHeadPos = desiredHeadPos;
+            strands[0].Particles[0].Color = float4(0, 1, 0, 1);
+        }
+        else
+        {
+            strands[0].Particles[0].Color = float4(0, 0, 1, 1);
+            ret.NewHeadPos = desiredHeadPos;
+            ret.NewTailPos = tailPos + (headPos - tailPos) * length(desiredHeadPos - headPos);
+        }
     }
+    
     
     
     return ret;
@@ -159,10 +221,11 @@ void RecursiveTractrix(int idx, float3 Xp, float reverse)
     float3 X = strands[idx].Particles[tailParticleIdx].Position;
     float3 Xh = strands[idx].Particles[headParticleIdx].Position;
     
+    TractrixStepReturn tractrixResult;
     
     for (int i = 1; i <= strands[idx].ParticlesCount - 1; i++)
     {
-        TractrixStepReturn tractrixResult = TractrixStep(X, Xh, Xp);
+        tractrixResult = TractrixStep(X, Xh, Xp);
 
         X = strands[idx].Particles[tailParticleIdx + i * dir].Position;
         Xh = strands[idx].Particles[headParticleIdx + i * dir].Position;
@@ -171,6 +234,9 @@ void RecursiveTractrix(int idx, float3 Xp, float reverse)
         strands[idx].Particles[tailParticleIdx + i * dir - dir].Position = tractrixResult.NewTailPos;
         strands[idx].Particles[headParticleIdx + i * dir - dir].Position = tractrixResult.NewHeadPos;
     }
+    
+    //strands[idx].Particles[0].Position = tractrixResult.NewTailPos;
+    
 }
 
 void InsertValueIntoKnot(int idx, float newKnotValue)
@@ -253,10 +319,6 @@ void InsertValueIntoKnot(int idx, float newKnotValue)
     }
 }
 
-bool floatEqual(float a, float b, float epsilon)
-{
-    return a - epsilon < b && a + epsilon > b;
-}
 
 void KnotRemoval(int idx, int i, float dotProdL0L1, float dotProdL1L2)
 {
@@ -495,14 +557,32 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
     
     float3 Xp = strands[idx].OriginalHeadPosition;
     //Xp = float3(-1, -4.5, 0) + float3(5 * sin(totalTime * 0.5), 0, 0);
-    Xp = strands[idx].OriginalHeadPosition + strands[idx].DesiredHeadMovement * min(totalTime * 0.25, 1); //Test position for KnotInsertionTest (see TractrixSplineSimulation.cpp)
+    if(usePhysics)
+    {
+        //float timeDialation = 0.5;
+        //strands[idx].HeadVelocity += float3(0, -0.981, 0) * deltaTime * timeDialation;
+        ////strands[idx].HeadVelocity = normalize(strands[idx].HeadVelocity) * min(1, length(strands[idx].HeadVelocity));
+        //Xp = strands[idx].Particles[strands[idx].ParticlesCount - 1].Position + (strands[idx].HeadVelocity * deltaTime * timeDialation);
+        float timeDialation = 1;
+        strands[idx].HeadVelocity += float3(0, -0.981, 0) * 0.0001 * timeDialation;
+        //strands[idx].HeadVelocity = normalize(strands[idx].HeadVelocity) * min(1, length(strands[idx].HeadVelocity));
+        Xp = strands[idx].Particles[strands[idx].ParticlesCount - 1].Position + (strands[idx].HeadVelocity * 0.0001 * timeDialation);
+    }
+    else
+    {
+        Xp = strands[idx].OriginalHeadPosition + strands[idx].DesiredHeadMovement * min(totalTime * 0.25, 1); //Test position for KnotInsertionTest (see TractrixSplineSimulation.cpp)   
+        Xp = strands[idx].OriginalHeadPosition + totalTime * float3(-0.1, -1, 0);
+    }
+    
     
     if (doTractrix && !(stopIfKnotChanged && strands[idx].KnotHasChangedOnce))
     {
         RecursiveTractrix(idx, Xp, 0.0);
-        RecursiveTractrix(idx, strands[idx].HairRoot, 1.0);
-
+        //float3 backpullToRoot = strands[idx].Particles[0].Position;
+        //RecursiveTractrix(idx, strands[idx].HairRoot, 1.0);
+        //backpullToRoot = backpullToRoot - strands[idx].HairRoot;
+        //strands[idx].HeadVelocity -= backpullToRoot * deltaTime;
     }
 
-    KnotInsertionAndRemoval(idx);
+    //KnotInsertionAndRemoval(idx);
 }

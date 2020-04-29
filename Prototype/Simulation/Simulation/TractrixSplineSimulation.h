@@ -27,10 +27,12 @@ public:
 		float DoKnotInsertion;
 		float DoKnotRemoval;
 		float StopIfKnotChanged;
+		float UsePhysics;
+		XMFLOAT3 Padding;
 
-		PropertiesConstBuf(bool doTractrix, bool doKnotInsertion, bool doKnotRemoval, bool stopIfKnotChanged) :
+		PropertiesConstBuf(bool doTractrix, bool doKnotInsertion, bool doKnotRemoval, bool stopIfKnotChanged, bool usePhysics) :
 			DoTractrix(doTractrix ? 1.0f : 0.0f), DoKnotInsertion(doKnotInsertion ? 1.0f : 0.0f), DoKnotRemoval(doKnotRemoval ? 1.0f : 0.0f), 
-			StopIfKnotChanged(stopIfKnotChanged ? 1.0f : 0.0f) { };
+			StopIfKnotChanged(stopIfKnotChanged ? 1.0f : 0.0f), UsePhysics(usePhysics ? 1.0f : 0.0f) { };
 	};
 
 	struct Particle
@@ -51,6 +53,7 @@ public:
 		XMFLOAT3 HairRoot;
 		XMFLOAT3 DesiredHeadMovement;
 		XMFLOAT3 OriginalHeadPosition;
+		XMFLOAT3 HeadVelocity;
 		Particle Particles[MAX_PARTICLE_COUNT];
 		float Knot[MAX_KNOT_SIZE];
 		float KnotValues[MAX_KNOT_SIZE];
@@ -63,6 +66,7 @@ public:
 		Z4Points,
 		ZReverse4Points,
 		Z4PointsStretch,
+		I4Points,
 		Z5Points,
 		ZReverse5Points,
 		Z5PointsStretch

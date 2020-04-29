@@ -46,6 +46,14 @@ TractrixSplineSimulation::TractrixSplineSimulation(ID3D11Device *device, ID3D11D
 				XMFLOAT3(0, -1, 0)
 			};
 			break;
+		case TractrixSplineSimulation::Configuration::I4Points:
+			myDirections = {
+				XMFLOAT3(0, -1, 0),
+				XMFLOAT3(0, -1, 0),
+				XMFLOAT3(0, -1, 0)
+			};
+			break;		
+
 		case TractrixSplineSimulation::Configuration::Z5Points:
 		case TractrixSplineSimulation::Configuration::Z5PointsStretch:
 			myDirections = {
@@ -105,7 +113,9 @@ TractrixSplineSimulation::TractrixSplineSimulation(ID3D11Device *device, ID3D11D
 			case TractrixSplineSimulation::Configuration::Z4PointsStretch:
 				strands[i].DesiredHeadMovement = XMFLOAT3(1, -0.7, 0);
 				break;
-
+			case TractrixSplineSimulation::Configuration::I4Points:
+				strands[i].DesiredHeadMovement = XMFLOAT3(0, -1, 0);
+				break;
 			case TractrixSplineSimulation::Configuration::Z5Points:
 				strands[i].DesiredHeadMovement = XMFLOAT3(0.7, 2.5, 0);
 				break;
@@ -120,6 +130,7 @@ TractrixSplineSimulation::TractrixSplineSimulation(ID3D11Device *device, ID3D11D
 				break;
 		}
 
+		strands[i].HeadVelocity = XMFLOAT3(0, 0, 0);
 		strands[i].HairRoot = strandPoints[i][0];
 		strands[i].OriginalHeadPosition = strandPoints[i][strandPoints[i].size() - 1];
 		strands[i].KnotHasChangedOnce = 0.0;

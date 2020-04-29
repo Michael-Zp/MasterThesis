@@ -53,7 +53,7 @@ bool Entry::Init()
 	//mRenderItems.push_back(new HairSimulatedWithOneDFlexObj(md3dDevice, md3dImmediateContext));
 	//mRenderItems.push_back(new HairSimulatedWithTrectrix(md3dDevice, md3dImmediateContext));
 	//mRenderItems.push_back(new BSpline(md3dDevice));
-	mRenderItems.push_back(new HairSimulatedWithTractixSplines(md3dDevice, md3dImmediateContext, { true, true, true, true }, (XMFLOAT4)Colors::Magenta, TractrixSplineSimulation::Configuration::Z5PointsStretch));
+	mRenderItems.push_back(new HairSimulatedWithTractixSplines(md3dDevice, md3dImmediateContext, { true, true, true, false, true }, (XMFLOAT4)Colors::Magenta, TractrixSplineSimulation::Configuration::Z4Points));
 	//mRenderItems.push_back(new HairSimulatedWithTractixSplines(md3dDevice, md3dImmediateContext, { true, false, false, true }, (XMFLOAT4)Colors::Red, TractrixSplineSimulation::Configuration::Z5PointsStretch));
 	mRenderItems.push_back(new HairBase(md3dDevice));
 

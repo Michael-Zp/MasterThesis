@@ -17,6 +17,7 @@ struct Strand
     float3 HairRoot;
     float3 DesiredHeadMovement;
     float3 OriginalHeadPosition;
+    float3 HeadVelocity;
     Particle Particles[MAX_PARTICLE_COUNT];
     float Knot[MAX_KNOT_SIZE];
     float KnotValues[MAX_KNOT_SIZE];
