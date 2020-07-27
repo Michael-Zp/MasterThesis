@@ -1,10 +1,10 @@
-#include "TractrixSplineSimulation.h"
+#include "TractrixSplineSimulationStrandTxAverage.h"
 
 #include "ResetUtils.h"
 #include "GeometryGenerator.h"
 
 
-TractrixSplineSimulation::TractrixSplineSimulation(ID3D11Device *device, ID3D11DeviceContext *context, PropertiesConstBuf props, XMFLOAT4 strandColor, Configuration config)
+TractrixSplineSimulationStrandTxAverage::TractrixSplineSimulationStrandTxAverage(ID3D11Device *device, ID3D11DeviceContext *context, PropertiesConstBuf props, XMFLOAT4 strandColor, Configuration config)
 {
 	std::vector<GeometryGenerator::MeshData> meshData;
 	GeometryGenerator generator;
@@ -31,53 +31,53 @@ TractrixSplineSimulation::TractrixSplineSimulation(ID3D11Device *device, ID3D11D
 	std::vector<XMFLOAT3> myDirections;
 	switch (config)
 	{
-		case TractrixSplineSimulation::Configuration::Z4Points:
-		case TractrixSplineSimulation::Configuration::Z4PointsStretch:
-			myDirections = {
-				XMFLOAT3(0, -1, 0),
-				XMFLOAT3(1, 0, 0),
-				XMFLOAT3(0, -1, 0)
-			};
-			break;
-		case TractrixSplineSimulation::Configuration::ZReverse4Points:
-			myDirections = {
-				XMFLOAT3(0, -1, 0),
-				XMFLOAT3(-1, 0, 0),
-				XMFLOAT3(0, -1, 0)
-			};
-			break;
-		case TractrixSplineSimulation::Configuration::I4Points:
-			myDirections = {
-				XMFLOAT3(0, -1, 0),
-				XMFLOAT3(0, -1, 0),
-				XMFLOAT3(0, -1, 0)
-			};
-			break;		
+	case TractrixSplineSimulationStrandTxAverage::Configuration::Z4Points:
+	case TractrixSplineSimulationStrandTxAverage::Configuration::Z4PointsStretch:
+		myDirections = {
+			XMFLOAT3(0, -1, 0),
+			XMFLOAT3(1, 0, 0),
+			XMFLOAT3(0, -1, 0)
+		};
+		break;
+	case TractrixSplineSimulationStrandTxAverage::Configuration::ZReverse4Points:
+		myDirections = {
+			XMFLOAT3(0, -1, 0),
+			XMFLOAT3(-1, 0, 0),
+			XMFLOAT3(0, -1, 0)
+		};
+		break;
+	case TractrixSplineSimulationStrandTxAverage::Configuration::I4Points:
+		myDirections = {
+			XMFLOAT3(0, -1, 0),
+			XMFLOAT3(0, -1, 0),
+			XMFLOAT3(0, -1, 0)
+		};
+		break;
 
-		case TractrixSplineSimulation::Configuration::Z5Points:
-		case TractrixSplineSimulation::Configuration::Z5PointsStretch:
-			myDirections = {
-				XMFLOAT3(0, -1, 0),
-				XMFLOAT3(1, 0, 0),
-				XMFLOAT3(0, -1, 0),
-				XMFLOAT3(-1, -1, 0)
-			};
-			break;
-		case TractrixSplineSimulation::Configuration::ZReverse5Points:
-			myDirections = {
-				XMFLOAT3(0, -1, 0),
-				XMFLOAT3(1, 0, 0),
-				XMFLOAT3(0, -1, 0),
-				XMFLOAT3(-1, -1, 0)
-			};
-			break;
-		default:
-			myDirections = {
-				XMFLOAT3(0, -1, 0),
-				XMFLOAT3(1, 0, 0),
-				XMFLOAT3(0, -1, 0)
-			};
-			break;
+	case TractrixSplineSimulationStrandTxAverage::Configuration::Z5Points:
+	case TractrixSplineSimulationStrandTxAverage::Configuration::Z5PointsStretch:
+		myDirections = {
+			XMFLOAT3(0, -1, 0),
+			XMFLOAT3(1, 0, 0),
+			XMFLOAT3(0, -1, 0),
+			XMFLOAT3(-1, -1, 0)
+		};
+		break;
+	case TractrixSplineSimulationStrandTxAverage::Configuration::ZReverse5Points:
+		myDirections = {
+			XMFLOAT3(0, -1, 0),
+			XMFLOAT3(1, 0, 0),
+			XMFLOAT3(0, -1, 0),
+			XMFLOAT3(-1, -1, 0)
+		};
+		break;
+	default:
+		myDirections = {
+			XMFLOAT3(0, -1, 0),
+			XMFLOAT3(1, 0, 0),
+			XMFLOAT3(0, -1, 0)
+		};
+		break;
 	}
 
 	XMFLOAT3 basePoint(0, 1.25, 0);
@@ -92,7 +92,7 @@ TractrixSplineSimulation::TractrixSplineSimulation(ID3D11Device *device, ID3D11D
 		strandPoints[0].push_back(tempPoint);
 	}
 
-	std::vector<TractrixSplineSimulation::Strand> strands;
+	std::vector<TractrixSplineSimulationStrandTxAverage::Strand> strands;
 
 
 	strands.resize(strandPoints.size());
@@ -106,32 +106,30 @@ TractrixSplineSimulation::TractrixSplineSimulation(ID3D11Device *device, ID3D11D
 
 		switch (config)
 		{
-			case TractrixSplineSimulation::Configuration::Z4Points:
-			case TractrixSplineSimulation::Configuration::ZReverse4Points:
-				strands[i].DesiredHeadMovement = XMFLOAT3(-1, 0.7, 0);
-				break;
-			case TractrixSplineSimulation::Configuration::Z4PointsStretch:
-				strands[i].DesiredHeadMovement = XMFLOAT3(1, -0.7, 0);
-				break;
-			case TractrixSplineSimulation::Configuration::I4Points:
-				strands[i].DesiredHeadMovement = XMFLOAT3(0, -1, 0);
-				break;
-			case TractrixSplineSimulation::Configuration::Z5Points:
-				strands[i].DesiredHeadMovement = XMFLOAT3(0.7, 2.5, 0);
-				break;
-			case TractrixSplineSimulation::Configuration::ZReverse5Points:
-				strands[i].DesiredHeadMovement = XMFLOAT3(-1, 0.7, 0);
-				break;
-			case TractrixSplineSimulation::Configuration::Z5PointsStretch:
-				strands[i].DesiredHeadMovement = XMFLOAT3(1, -1.7, 0);
-				break;
-			default:
-				strands[i].DesiredHeadMovement = XMFLOAT3(-1, 0.7, 0);
-				break;
+		case TractrixSplineSimulationStrandTxAverage::Configuration::Z4Points:
+		case TractrixSplineSimulationStrandTxAverage::Configuration::ZReverse4Points:
+			strands[i].DesiredHeadMovement = XMFLOAT3(-1, 0.7, 0);
+			break;
+		case TractrixSplineSimulationStrandTxAverage::Configuration::Z4PointsStretch:
+			strands[i].DesiredHeadMovement = XMFLOAT3(1, -0.7, 0);
+			break;
+		case TractrixSplineSimulationStrandTxAverage::Configuration::I4Points:
+			strands[i].DesiredHeadMovement = XMFLOAT3(0, -1, 0);
+			break;
+		case TractrixSplineSimulationStrandTxAverage::Configuration::Z5Points:
+			strands[i].DesiredHeadMovement = XMFLOAT3(0.7, 2.5, 0);
+			break;
+		case TractrixSplineSimulationStrandTxAverage::Configuration::ZReverse5Points:
+			strands[i].DesiredHeadMovement = XMFLOAT3(-1, 0.7, 0);
+			break;
+		case TractrixSplineSimulationStrandTxAverage::Configuration::Z5PointsStretch:
+			strands[i].DesiredHeadMovement = XMFLOAT3(1, -1.7, 0);
+			break;
+		default:
+			strands[i].DesiredHeadMovement = XMFLOAT3(-1, 0.7, 0);
+			break;
 		}
 
-		strands[i].HeadVelocity = XMFLOAT3(0, 0, 0);
-		strands[i].HeadMass = 1;
 		strands[i].HairRoot = strandPoints[i][0];
 		strands[i].OriginalHeadPosition = strandPoints[i][strandPoints[i].size() - 1];
 		strands[i].KnotHasChangedOnce = 0.0;
@@ -169,7 +167,9 @@ TractrixSplineSimulation::TractrixSplineSimulation(ID3D11Device *device, ID3D11D
 		{
 			strands[i].Particles[k] = {
 				meshData[i].Vertices[k].Position,
-				strandColor
+				strandColor,
+				XMFLOAT3(0, 0, 0),
+				1
 			};
 		}
 	}
@@ -212,7 +212,7 @@ TractrixSplineSimulation::TractrixSplineSimulation(ID3D11Device *device, ID3D11D
 	HR(device->CreateShaderResourceView(mStructuredBuffer, &srvDesc, &mSRV));
 
 
-	
+
 	D3D11_BUFFER_DESC timeConstBufDesc;
 	timeConstBufDesc.ByteWidth = sizeof(TimeConstBuf);
 	timeConstBufDesc.Usage = D3D11_USAGE_DYNAMIC;
@@ -231,7 +231,7 @@ TractrixSplineSimulation::TractrixSplineSimulation(ID3D11Device *device, ID3D11D
 	HR(device->CreateBuffer(&timeConstBufDesc, &timeSubData, &mTimeConstBuf));
 
 
-	
+
 	D3D11_BUFFER_DESC propertiesConstBufDesc;
 	propertiesConstBufDesc.ByteWidth = sizeof(PropertiesConstBuf);
 	propertiesConstBufDesc.Usage = D3D11_USAGE_IMMUTABLE;
@@ -239,24 +239,24 @@ TractrixSplineSimulation::TractrixSplineSimulation(ID3D11Device *device, ID3D11D
 	propertiesConstBufDesc.CPUAccessFlags = 0;
 	propertiesConstBufDesc.MiscFlags = 0;
 	propertiesConstBufDesc.StructureByteStride = 0;
-	
+
 	D3D11_SUBRESOURCE_DATA propertiesSubData;
 	propertiesSubData.pSysMem = &props;
 
 	HR(device->CreateBuffer(&propertiesConstBufDesc, &propertiesSubData, &mPropertiesConstBuf));
 
 
-	mComputeShader = new ComputeShader(L"./Shader/cTractrixSplineSimulation.hlsl", "Simulation", true);
+	mComputeShader = new ComputeShader(L"./Shader/cTractrixSplineSimulationStrandTxAverage.hlsl", "Simulation", true);
 	mComputeShader->prepare(device);
 }
 
 
-TractrixSplineSimulation::~TractrixSplineSimulation()
+TractrixSplineSimulationStrandTxAverage::~TractrixSplineSimulationStrandTxAverage()
 {
 
 }
 
-void TractrixSplineSimulation::Simulate(const float deltaTime, ID3D11DeviceContext *context)
+void TractrixSplineSimulationStrandTxAverage::Simulate(const float deltaTime, ID3D11DeviceContext *context)
 {
 	ElapsedTimeInSimulation += deltaTime;
 
@@ -272,7 +272,7 @@ void TractrixSplineSimulation::Simulate(const float deltaTime, ID3D11DeviceConte
 
 	mComputeShader->activate(context);
 
-	
+
 	context->CSSetUnorderedAccessViews(0, 1, &mUAV, NULL);
 	ID3D11Buffer* buf[2];
 	buf[0] = mTimeConstBuf;

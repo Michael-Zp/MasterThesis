@@ -169,6 +169,7 @@
     <ClInclude Include="HairSimulatedWithTractixSplines.h" />
     <ClInclude Include="HairSimulatedWithTrectrix.h" />
     <ClInclude Include="IDrawable.h" />
+    <ClInclude Include="ITractrixSimulation.h" />
     <ClInclude Include="LightHelper.h" />
     <ClInclude Include="MassSpringSimulation.h" />
     <ClInclude Include="MathHelper.h" />
@@ -183,6 +184,10 @@
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TractrixSimulation.h" />
     <ClInclude Include="TractrixSplineSimulation.h" />
+    <ClInclude Include="TractrixSplineSimulationGlobalForces.h" />
+    <ClInclude Include="TractrixSplineSimulationMultipleSingleTxSteps.h" />
+    <ClInclude Include="TractrixSplineSimulationMultipleTxAverage.h" />
+    <ClInclude Include="TractrixSplineSimulationStrandTxAverage.h" />
     <ClInclude Include="VertexShader.h" />
   </ItemGroup>
   <ItemGroup>
@@ -215,6 +220,10 @@
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TractrixSimulation.cpp" />
     <ClCompile Include="TractrixSplineSimulation.cpp" />
+    <ClCompile Include="TractrixSplineSimulationGlobalForces.cpp" />
+    <ClCompile Include="TractrixSplineSimulationMultipleSingleTxSteps.cpp" />
+    <ClCompile Include="TractrixSplineSimulationMultipleTxAverage.cpp" />
+    <ClCompile Include="TractrixSplineSimulationStrandTxAverage.cpp" />
     <ClCompile Include="VertexShader.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -351,6 +360,26 @@
       <FileType>Document</FileType>
     </None>
     <None Include="Shader\vgpTractrixSplinesSplines.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shader\cTractrixSplineSimulationGlobalForces.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shader\cTractrixSplineSimulationMultipleSingleTxSteps.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shader\cTractrixSplineSimulationStrandTxAverage.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shader\cTractrixSplineSimulationMultipleTxAverage.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

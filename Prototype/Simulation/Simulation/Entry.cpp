@@ -13,6 +13,9 @@
 #include "BSpline.h"
 #include "HairSimulatedWithTractixSplines.h"
 #include "TractrixSplineSimulation.h"
+#include "TractrixSplineSimulationMultipleSingleTxSteps.h"
+#include "TractrixSplineSimulationStrandTxAverage.h"
+#include "TractrixSplineSimulationMultipleTxAverage.h"
 
 Entry::Entry(HINSTANCE hInstance) : D3DApp(hInstance)
 {
@@ -53,8 +56,11 @@ bool Entry::Init()
 	//mRenderItems.push_back(new HairSimulatedWithOneDFlexObj(md3dDevice, md3dImmediateContext));
 	//mRenderItems.push_back(new HairSimulatedWithTrectrix(md3dDevice, md3dImmediateContext));
 	//mRenderItems.push_back(new BSpline(md3dDevice));
-	mRenderItems.push_back(new HairSimulatedWithTractixSplines(md3dDevice, md3dImmediateContext, { true, true, true, false, true }, (XMFLOAT4)Colors::Magenta, TractrixSplineSimulation::Configuration::Z4Points));
-	//mRenderItems.push_back(new HairSimulatedWithTractixSplines(md3dDevice, md3dImmediateContext, { true, false, false, true }, (XMFLOAT4)Colors::Red, TractrixSplineSimulation::Configuration::Z5PointsStretch));
+	//mRenderItems.push_back(new HairSimulatedWithTractixSplines(md3dDevice, md3dImmediateContext, new TractrixSplineSimulationGlobalForces(md3dDevice, md3dImmediateContext, { true, true, true, false }, (XMFLOAT4)Colors::Magenta, TractrixSplineSimulationGlobalForces::Configuration::Z4Points)));
+	//mRenderItems.push_back(new HairSimulatedWithTractixSplines(md3dDevice, md3dImmediateContext, new TractrixSplineSimulation(md3dDevice, md3dImmediateContext, { true, false, false, true, true }, (XMFLOAT4)Colors::Red, TractrixSplineSimulation::Configuration::Z5PointsStretch)));
+	//mRenderItems.push_back(new HairSimulatedWithTractixSplines(md3dDevice, md3dImmediateContext, new TractrixSplineSimulationMultipleSingleTxSteps(md3dDevice, md3dImmediateContext, { true, false, false, true }, (XMFLOAT4)Colors::Red, TractrixSplineSimulationMultipleSingleTxSteps::Configuration::Z4Points)));
+	//mRenderItems.push_back(new HairSimulatedWithTractixSplines(md3dDevice, md3dImmediateContext, new TractrixSplineSimulationStrandTxAverage(md3dDevice, md3dImmediateContext, { true, false, false, true }, (XMFLOAT4)Colors::Red, TractrixSplineSimulationStrandTxAverage::Configuration::Z4Points)));
+	mRenderItems.push_back(new HairSimulatedWithTractixSplines(md3dDevice, md3dImmediateContext, new TractrixSplineSimulationMultipleTxAverage(md3dDevice, md3dImmediateContext, { true, false, false, true }, (XMFLOAT4)Colors::Red, TractrixSplineSimulationMultipleTxAverage::Configuration::Z4Points)));
 	mRenderItems.push_back(new HairBase(md3dDevice));
 
 	return true;
@@ -136,5 +142,7 @@ void Entry::DrawScene()
 		mRenderItems[i]->Draw(mTimer.DeltaTime(), md3dImmediateContext);
 	}
 
-	HR(mSwapChain->Present(0, 0));
+	//Enable/Disable FrameCap
+	//HR(mSwapChain->Present(0, 0)); //Enabled
+	HR(mSwapChain->Present(1, 0)); //Disabled (1 - 4 are the steps. 1 == maxFrameRate of Monitor)
 }

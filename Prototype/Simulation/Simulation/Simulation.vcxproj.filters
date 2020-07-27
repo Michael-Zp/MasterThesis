@@ -222,6 +222,21 @@
     <ClInclude Include="RenderItem.h">
       <Filter>Header Files\Engine\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="TractrixSplineSimulationGlobalForces.h">
+      <Filter>Header Files\Simulation\TractrixSplines</Filter>
+    </ClInclude>
+    <ClInclude Include="ITractrixSimulation.h">
+      <Filter>Header Files\Simulation\TractrixSplines</Filter>
+    </ClInclude>
+    <ClInclude Include="TractrixSplineSimulationMultipleSingleTxSteps.h">
+      <Filter>Header Files\Simulation\TractrixSplines</Filter>
+    </ClInclude>
+    <ClInclude Include="TractrixSplineSimulationStrandTxAverage.h">
+      <Filter>Header Files\Simulation\TractrixSplines</Filter>
+    </ClInclude>
+    <ClInclude Include="TractrixSplineSimulationMultipleTxAverage.h">
+      <Filter>Header Files\Simulation\TractrixSplines</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Entry.cpp">
@@ -314,6 +329,18 @@
     <ClCompile Include="TractrixSplineSimulation.cpp">
       <Filter>Source Files\Simulation\TractrixSplines</Filter>
     </ClCompile>
+    <ClCompile Include="TractrixSplineSimulationGlobalForces.cpp">
+      <Filter>Source Files\Simulation\TractrixSplines</Filter>
+    </ClCompile>
+    <ClCompile Include="TractrixSplineSimulationMultipleSingleTxSteps.cpp">
+      <Filter>Source Files\Simulation\TractrixSplines</Filter>
+    </ClCompile>
+    <ClCompile Include="TractrixSplineSimulationStrandTxAverage.cpp">
+      <Filter>Source Files\Simulation\TractrixSplines</Filter>
+    </ClCompile>
+    <ClCompile Include="TractrixSplineSimulationMultipleTxAverage.cpp">
+      <Filter>Source Files\Simulation\TractrixSplines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\cSimulation.hlsl">
@@ -374,6 +401,18 @@
       <Filter>Shaders\TractrixSplines</Filter>
     </None>
     <None Include="Shader\vgpTractrixSplinesSplines.hlsl">
+      <Filter>Shaders\TractrixSplines</Filter>
+    </None>
+    <None Include="Shader\cTractrixSplineSimulationGlobalForces.hlsl">
+      <Filter>Shaders\TractrixSplines</Filter>
+    </None>
+    <None Include="Shader\cTractrixSplineSimulationMultipleSingleTxSteps.hlsl">
+      <Filter>Shaders\TractrixSplines</Filter>
+    </None>
+    <None Include="Shader\cTractrixSplineSimulationStrandTxAverage.hlsl">
+      <Filter>Shaders\TractrixSplines</Filter>
+    </None>
+    <None Include="Shader\cTractrixSplineSimulationMultipleTxAverage.hlsl">
       <Filter>Shaders\TractrixSplines</Filter>
     </None>
   </ItemGroup>

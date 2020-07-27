@@ -4,12 +4,13 @@
 #include "ResetUtils.h"
 #include "RenderItem.h"
 #include "TractrixSplineSimulation.h"
+#include "TractrixSplineSimulationGlobalForces.h"
 
 
 class HairSimulatedWithTractixSplines : public IDrawable
 {
 public:
-	HairSimulatedWithTractixSplines(ID3D11Device *device, ID3D11DeviceContext *context, TractrixSplineSimulation::PropertiesConstBuf simulationProps, XMFLOAT4 strandColor, TractrixSplineSimulation::Configuration config);
+	HairSimulatedWithTractixSplines(ID3D11Device *device, ID3D11DeviceContext *context, ITractrixSimulation *simulation);
 	~HairSimulatedWithTractixSplines();
 
 	void Draw(float deltaTime, ID3D11DeviceContext *context);
@@ -43,7 +44,7 @@ private:
 
 	RenderItem mSplineRenderItem;
 	RenderItem mControlPolygonRenderItem;
-	TractrixSplineSimulation *mSimulation;
+	ITractrixSimulation *mSimulation;
 	
 	CameraConstantBuffer mConstantBufferData;
 	ID3D11Buffer *mCameraCB;
