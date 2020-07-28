@@ -49,6 +49,7 @@ public:
 		XMFLOAT3 HairRoot;
 		XMFLOAT3 DesiredHeadMovement;
 		XMFLOAT3 OriginalHeadPosition;
+		XMFLOAT3 DesiredSegmentDirections[MAX_PARTICLE_COUNT - 1];
 		Particle Particles[MAX_PARTICLE_COUNT];
 		float Knot[MAX_KNOT_SIZE];
 		float KnotValues[MAX_KNOT_SIZE];

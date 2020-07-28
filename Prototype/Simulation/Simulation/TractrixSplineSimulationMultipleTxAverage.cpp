@@ -161,7 +161,13 @@ TractrixSplineSimulationMultipleTxAverage::TractrixSplineSimulationMultipleTxAve
 			Knot:			0 0	   0    0 1 2 2 2
 			KnotValues:		0 0.33 0.67 1 2
 		*/
-
+		for (int k = 0; k < strands[i].ParticlesCount - 1; k++)
+		{
+			XMVECTOR tail = XMLoadFloat3(&meshData[i].Vertices[k].Position);
+			XMVECTOR head = XMLoadFloat3(&meshData[i].Vertices[k + 1].Position);
+			XMVECTOR direction = XMVector3Normalize(head - tail);
+			XMStoreFloat3(&strands[i].DesiredSegmentDirections[k], direction);
+		}
 
 		for (int k = 0; k < strands[i].ParticlesCount; k++)
 		{

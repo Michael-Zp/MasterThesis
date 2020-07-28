@@ -686,6 +686,10 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
         strands[idx].Particles[i].Velocity -= sign(strands[idx].Particles[i].Velocity) * abs(dragForce);
         
         desiredPosition[i] = strands[idx].Particles[i].Position + strands[idx].Particles[i].Velocity * deltaTime;
+        
+        float3 desiredPositionByHairStyle = strands[idx].Particles[i - 1].Position + normalize(strands[idx].DesiredSegmentDirections[i - 1]) * oldSegmentLength[i - 1];
+        float hairStyleFactor = 0.1;
+        strands[idx].Particles[i].Velocity += pow((desiredPositionByHairStyle - strands[idx].Particles[i].Position), 2) * 0.5;
     }
     
     //TODO Maybe use less space with using one 1D array, and calculating like:
@@ -704,6 +708,9 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
     const static int numberOfParticlesAveraged = 4;
     
     
+    //Make copy of all temporary strands and pull them back
+    //This backpull is used for altering the velocity of the particle for which the temporary strand was generated
+    //This backpull will prevent velocities from going out of hand as this will service as the counter force by the strand and the root
     for (int backpullForce_i = 1; backpullForce_i < numberOfParticlesAveraged; backpullForce_i++)
     {
         for (int backpullForce_u = 0; backpullForce_u < numberOfParticlesAveraged; backpullForce_u++)
@@ -754,6 +761,14 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
     {
         averageDirs[getDirs_i] = currentParticlePosition[getDirs_i + 1] - currentParticlePosition[getDirs_i];
     }
+    
+    //Add the desired strand direction to the average directions to maintain a certain hair style
+    //for (int addDesiredStrandDirection_i = 0; addDesiredStrandDirection_i < numberOfParticlesAveraged - 1; addDesiredStrandDirection_i++)
+    //{
+    //    float hairStyleFactor = 0.05;
+    //    averageDirs[addDesiredStrandDirection_i] = (1 - hairStyleFactor) * averageDirs[addDesiredStrandDirection_i];
+    //    averageDirs[addDesiredStrandDirection_i] += hairStyleFactor * strands[idx].DesiredSegmentDirections[addDesiredStrandDirection_i];
+    //}
    
     
     //Set the particle positions, by setting the root position as the average position of every simulation
