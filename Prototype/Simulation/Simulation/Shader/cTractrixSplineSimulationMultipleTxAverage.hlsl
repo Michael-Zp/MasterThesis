@@ -652,6 +652,13 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
         originalPosition[op_i] = strands[idx].Particles[op_i].Position;
     }
     
+    //Get the old segment length of each segment, to maintain the strand structure
+    float oldSegmentLength[MAX_PARTICLE_COUNT - 1];
+    for (int u = 0; u < MAX_PARTICLE_COUNT - 1; u++)
+    {
+        oldSegmentLength[u] = length(strands[idx].Particles[u].Position - strands[idx].Particles[u + 1].Position);
+    }
+    
     
     float3 desiredPosition[MAX_PARTICLE_COUNT];
     for (int dp_i = 0; dp_i < MAX_PARTICLE_COUNT; dp_i++)
@@ -666,7 +673,18 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
     for (int i = 1; i < MAX_PARTICLE_COUNT; i++)
     {
         strands[idx].Particles[i].Velocity += float3(0, -9.81, 0) * strands[idx].Particles[i].Mass * deltaTime * timeDialation;
-        strands[idx].Particles[i].Velocity *= 0.995; // Drag
+        strands[idx].Particles[i].Velocity *= 0.995; // Simple drag
+        
+        
+        //Drag force by air resistance
+        float airDensity = 1.2; //Density of air see: https://en.wikipedia.org/wiki/Density
+        float3 velocitySquare = pow(strands[idx].Particles[i].Velocity, float3(2, 2, 2));
+        float dragCoefficient = 0.47; //Hair should be roughtly a sphere see https://en.wikipedia.org/wiki/Drag_coefficient
+        float crossSection = (0.1 / 100) * oldSegmentLength[i - 1]; //Diameter of hair (ranges from 0.017mm to 0.18mm see https://en.wikipedia.org/wiki/Hair thus ~0.1mm thus 0.01cm)[right now I am in cm/s^2 for gravity]
+        float3 dragForce = 0.5 * airDensity * velocitySquare * dragCoefficient * crossSection;
+        
+        strands[idx].Particles[i].Velocity -= sign(strands[idx].Particles[i].Velocity) * abs(dragForce);
+        
         desiredPosition[i] = strands[idx].Particles[i].Position + strands[idx].Particles[i].Velocity * deltaTime;
     }
     
@@ -736,13 +754,7 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
     {
         averageDirs[getDirs_i] = currentParticlePosition[getDirs_i + 1] - currentParticlePosition[getDirs_i];
     }
-    
-    //Get the old segment length of each segment, to maintain the strand structure
-    float oldSegmentLength[MAX_PARTICLE_COUNT - 1];
-    for (int u = 0; u < MAX_PARTICLE_COUNT - 1; u++)
-    {
-        oldSegmentLength[u] = length(strands[idx].Particles[u].Position - strands[idx].Particles[u + 1].Position);
-    }
+   
     
     //Set the particle positions, by setting the root position as the average position of every simulation
     //The next particle positions will be determined by the last set position + the average direction of the strand * the segment length
