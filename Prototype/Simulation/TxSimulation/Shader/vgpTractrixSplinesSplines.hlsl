@@ -99,7 +99,12 @@ VertexOut HairVS(uint vertexId : SV_VertexID)
     float4x4 viewProj = mul(view, proj);
     viewProj = transpose(viewProj);
     
-    int strandIdx = (int) floor(vertexId / vertexCount);
+    int strandIdx = (int) floor(vertexId / (vertexCount * 2));
+    
+    vertexId = vertexId % (vertexCount * 2);
+    vertexId = floor(vertexId / 2) + vertexId % 2;
+    vertexId = min(vertexId, vertexCount - 1);
+    
     float3 pos = splines(vertexId, strandIdx);
     
     vout.position = mul(float4(pos, 1.0f), world);

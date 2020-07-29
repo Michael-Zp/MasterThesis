@@ -72,6 +72,7 @@ public:
 
 	ID3D11ShaderResourceView** GetSRVPtr() { return &mSRV; };
 	int GetParticlesCount() { return mStrandsCount * MAX_PARTICLE_COUNT; };
+	int GetStrandsCount() { return mStrandsCount; };
 
 private:
 
