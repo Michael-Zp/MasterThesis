@@ -632,15 +632,15 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
     //The root does not have a desiredPosition, because it does not move on its own and if the head moves, than the movement is covered by the backpull
     for (int i = 1; i < MAX_PARTICLE_COUNT; i++)
     {
-        strands[idx].Particles[i].Velocity += float3(0, -9.81, 0) * strands[idx].Particles[i].Mass * deltaTime * timeDialation;
-        strands[idx].Particles[i].Velocity *= 0.995; // Simple drag
+        strands[idx].Particles[i].Velocity += float3(0, -9.81, 0) * deltaTime * timeDialation;
+        strands[idx].Particles[i].Velocity *= 0.99; // Simple drag
         
         
         //Drag force by air resistance
         float airDensity = 1.2; //Density of air see: https://en.wikipedia.org/wiki/Density
         float3 velocitySquare = pow(strands[idx].Particles[i].Velocity, float3(2, 2, 2));
         float dragCoefficient = 0.47; //Hair should be roughtly a sphere see https://en.wikipedia.org/wiki/Drag_coefficient
-        float crossSection = (0.1 / 100) * oldSegmentLength[i - 1]; //Diameter of hair (ranges from 0.017mm to 0.18mm see https://en.wikipedia.org/wiki/Hair thus ~0.1mm thus 0.01cm)[right now I am in cm/s^2 for gravity]
+        float crossSection = (0.1 / 10) * oldSegmentLength[i - 1]; //Diameter of hair (ranges from 0.017mm to 0.18mm see https://en.wikipedia.org/wiki/Hair thus ~0.1mm thus 0.01cm)[right now I am in cm/s^2 for gravity]
         float3 dragForce = 0.5 * airDensity * velocitySquare * dragCoefficient * crossSection;
         
         strands[idx].Particles[i].Velocity -= sign(strands[idx].Particles[i].Velocity) * abs(dragForce);
@@ -651,6 +651,14 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
         float3 velocityToHairStylePos = desiredPositionByHairStyle - strands[idx].Particles[i].Position;
         float hairStyleFactor = 0.5;
         velocityToHairStylePos = sign(velocityToHairStylePos) * pow(velocityToHairStylePos, float3(2, 2, 2)) * hairStyleFactor;
+        
+        float velLength = length(strands[idx].Particles[i].Velocity);
+        
+        float3 normalizedVelToHairStylePos = normalize(velocityToHairStylePos);
+        if (all(!isnan(normalizedVelToHairStylePos)))
+        {
+            velocityToHairStylePos = normalize(velocityToHairStylePos) * min(length(velocityToHairStylePos), velLength / 2);
+        }
         
         strands[idx].Particles[i].Velocity += velocityToHairStylePos;
     }

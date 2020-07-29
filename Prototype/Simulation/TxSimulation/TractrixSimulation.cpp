@@ -6,129 +6,62 @@
 
 TractrixSimulation::TractrixSimulation(ID3D11Device *device, ID3D11DeviceContext *context, PropertiesConstBuf props, XMFLOAT4 strandColor, Configuration config)
 {
-	std::vector<GeometryGenerator::MeshData> meshData;
-	GeometryGenerator generator;
-
 	std::vector<std::vector<XMFLOAT3>> strandPoints;
 	strandPoints.resize(mStrandsCount);
-	//strandPoints[0].push_back(XMFLOAT3(0, 1.25, 0));
-	//strandPoints[0].push_back(XMFLOAT3(1, 0, 0));
-	//strandPoints[0].push_back(XMFLOAT3(0, -1.25, 0));
-	//strandPoints[0].push_back(XMFLOAT3(-1, -1.5, 0));
-	//strandPoints[0].push_back(XMFLOAT3(1, -2.75, 0));
-	//strandPoints[0].push_back(XMFLOAT3(-1, -4.5, 0));
-	//strandPoints[0].push_back(XMFLOAT3(0, -6.5, 0));
-
-	//Overall test
-	//std::vector<XMFLOAT3> myDirections = {
-	//	XMFLOAT3(0, -1, 0),
-	//	XMFLOAT3(1, -1, 0),
-	//	XMFLOAT3(-0.5, -1, 0),
-	//	XMFLOAT3(1, -1, 0),
-	//	XMFLOAT3(-2, -1, 0),
-	//	XMFLOAT3(3, -1, 0)
-	//};
-	std::vector<XMFLOAT3> myDirections;
-	switch (config)
-	{
-	case TractrixSimulation::Configuration::Z4Points:
-	case TractrixSimulation::Configuration::Z4PointsStretch:
-		myDirections = {
-			XMFLOAT3(0, -1, 0),
-			XMFLOAT3(1, 0, 0),
-			XMFLOAT3(0, -1, 0)
-		};
-		break;
-	case TractrixSimulation::Configuration::ZReverse4Points:
-		myDirections = {
-			XMFLOAT3(0, -1, 0),
-			XMFLOAT3(-1, 0, 0),
-			XMFLOAT3(0, -1, 0)
-		};
-		break;
-	case TractrixSimulation::Configuration::I4Points:
-		myDirections = {
-			XMFLOAT3(0, -1, 0),
-			XMFLOAT3(0, -1, 0),
-			XMFLOAT3(0, -1, 0)
-		};
-		break;
-
-	case TractrixSimulation::Configuration::Z5Points:
-	case TractrixSimulation::Configuration::Z5PointsStretch:
-		myDirections = {
-			XMFLOAT3(0, -1, 0),
-			XMFLOAT3(1, 0, 0),
-			XMFLOAT3(0, -1, 0),
-			XMFLOAT3(-1, -1, 0)
-		};
-		break;
-	case TractrixSimulation::Configuration::ZReverse5Points:
-		myDirections = {
-			XMFLOAT3(0, -1, 0),
-			XMFLOAT3(1, 0, 0),
-			XMFLOAT3(0, -1, 0),
-			XMFLOAT3(-1, -1, 0)
-		};
-		break;
-	default:
-		myDirections = {
-			XMFLOAT3(0, -1, 0),
-			XMFLOAT3(1, 0, 0),
-			XMFLOAT3(0, -1, 0)
-		};
-		break;
-	}
-
-	XMFLOAT3 basePoint(0, 1.25, 0);
-	XMVECTOR currentPoint = XMLoadFloat3(&basePoint);
-	strandPoints[0].push_back(basePoint);
-	for (int i = 0; i < myDirections.size(); i++)
-	{
-		XMVECTOR currDir = XMLoadFloat3(&myDirections[i]);
-		currentPoint += XMVector3Normalize(currDir);
-		XMFLOAT3 tempPoint;
-		XMStoreFloat3(&tempPoint, currentPoint);
-		strandPoints[0].push_back(tempPoint);
-	}
 
 	std::vector<TractrixSimulation::Strand> strands;
 
+	srand(time(NULL));
 
 	strands.resize(strandPoints.size());
-	meshData.resize(strandPoints.size());
 	for (int i = 0; i < strandPoints.size(); i++)
 	{
-		generator.CreateLineStrip(strandPoints[i], meshData[i]);
-
-		strands[i].ParticlesCount = strandPoints[i].size();
-		strands[i].StrandIdx = i;
-
+		std::vector<XMFLOAT3> myDirections;
 		switch (config)
 		{
 		case TractrixSimulation::Configuration::Z4Points:
-		case TractrixSimulation::Configuration::ZReverse4Points:
-			strands[i].DesiredHeadMovement = XMFLOAT3(-1, 0.7, 0);
+			myDirections = {
+				XMFLOAT3(0, -1, 0),
+				XMFLOAT3(1, 0, 0),
+				XMFLOAT3(0, -1, 0)
+			};
 			break;
-		case TractrixSimulation::Configuration::Z4PointsStretch:
-			strands[i].DesiredHeadMovement = XMFLOAT3(1, -0.7, 0);
-			break;
-		case TractrixSimulation::Configuration::I4Points:
-			strands[i].DesiredHeadMovement = XMFLOAT3(0, -1, 0);
-			break;
-		case TractrixSimulation::Configuration::Z5Points:
-			strands[i].DesiredHeadMovement = XMFLOAT3(0.7, 2.5, 0);
-			break;
-		case TractrixSimulation::Configuration::ZReverse5Points:
-			strands[i].DesiredHeadMovement = XMFLOAT3(-1, 0.7, 0);
-			break;
-		case TractrixSimulation::Configuration::Z5PointsStretch:
-			strands[i].DesiredHeadMovement = XMFLOAT3(1, -1.7, 0);
+		case TractrixSimulation::Configuration::Random:
+			myDirections.resize(mNumberOfSegments);
+			for (int i = 0; i < mNumberOfSegments; i++)
+			{
+				float x = (float(rand()) / float((RAND_MAX)) - 0.5) * 2;
+				float y = (float(rand()) / float((RAND_MAX)) - 0.5) * 2;
+				y = min(0.5, abs(y)) * -1;
+				float z = (float(rand()) / float((RAND_MAX)) - 0.5) * 2;
+				XMVECTOR vec = XMLoadFloat3(&XMFLOAT3(x, y, z));
+				vec = XMVector3Normalize(vec);
+				XMStoreFloat3(&myDirections[i], vec);
+			}
 			break;
 		default:
-			strands[i].DesiredHeadMovement = XMFLOAT3(-1, 0.7, 0);
+			myDirections = {
+				XMFLOAT3(0, -1, 0),
+				XMFLOAT3(1, 0, 0),
+				XMFLOAT3(0, -1, 0)
+			};
 			break;
 		}
+
+		XMFLOAT3 basePoint(0, 1.25, 0);
+		XMVECTOR currentPoint = XMLoadFloat3(&basePoint);
+		strandPoints[i].push_back(basePoint);
+		for (int k = 0; k < myDirections.size(); k++)
+		{
+			XMVECTOR currDir = XMLoadFloat3(&myDirections[k]);
+			currentPoint += XMVector3Normalize(currDir);
+			XMFLOAT3 tempPoint;
+			XMStoreFloat3(&tempPoint, currentPoint);
+			strandPoints[i].push_back(tempPoint);
+		}
+
+		strands[i].ParticlesCount = strandPoints[i].size();
+		strands[i].StrandIdx = i;
 
 		strands[i].HairRoot = strandPoints[i][0];
 		strands[i].OriginalHeadPosition = strandPoints[i][strandPoints[i].size() - 1];
@@ -163,8 +96,8 @@ TractrixSimulation::TractrixSimulation(ID3D11Device *device, ID3D11DeviceContext
 		*/
 		for (int k = 0; k < strands[i].ParticlesCount - 1; k++)
 		{
-			XMVECTOR tail = XMLoadFloat3(&meshData[i].Vertices[k].Position);
-			XMVECTOR head = XMLoadFloat3(&meshData[i].Vertices[k + 1].Position);
+			XMVECTOR tail = XMLoadFloat3(&strandPoints[i][k]);
+			XMVECTOR head = XMLoadFloat3(&strandPoints[i][k + 1]);
 			XMVECTOR direction = XMVector3Normalize(head - tail);
 			XMStoreFloat3(&strands[i].DesiredSegmentDirections[k], direction);
 		}
@@ -172,7 +105,7 @@ TractrixSimulation::TractrixSimulation(ID3D11Device *device, ID3D11DeviceContext
 		for (int k = 0; k < strands[i].ParticlesCount; k++)
 		{
 			strands[i].Particles[k] = {
-				meshData[i].Vertices[k].Position,
+				strandPoints[i][k],
 				strandColor,
 				XMFLOAT3(0, 0, 0),
 				1
@@ -284,8 +217,6 @@ void TractrixSimulation::Simulate(const float deltaTime, ID3D11DeviceContext *co
 	buf[0] = mTimeConstBuf;
 	buf[1] = mPropertiesConstBuf;
 	context->CSSetConstantBuffers(0, 2, buf);
-	//context->CSSetConstantBuffers(ConstBufSlots::TIME_CONST_BUF, 1, &mTimeConstBuf);
-	//context->CSSetConstantBuffers(ConstBufSlots::PROPERTEIS_CONST_BUF, 1, &mPropertiesConstBuf);
 
 	context->Dispatch(16, 1, 1);
 

@@ -19,7 +19,6 @@ struct Strand
     int ParticlesCount;
     int StrandIdx;
     float3 HairRoot;
-    float3 DesiredHeadMovement;
     float3 OriginalHeadPosition;
     float3 DesiredSegmentDirections[MAX_PARTICLE_COUNT - 1];
     Particle Particles[MAX_PARTICLE_COUNT];

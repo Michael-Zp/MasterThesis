@@ -118,7 +118,7 @@ void HairSimulatedWithTractixSplines::DrawSplines(const float deltaTime, ID3D11D
 
 void HairSimulatedWithTractixSplines::DrawControlPolygon(const float deltaTime, ID3D11DeviceContext * context)
 {
-	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
+	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
 	mControlPolygonRenderItem.mVertexShader->activate(context);
 	mControlPolygonRenderItem.mGeometryShader->activate(context);
@@ -135,7 +135,7 @@ void HairSimulatedWithTractixSplines::DrawControlPolygon(const float deltaTime, 
 
 	free(constBuffers);
 
-	context->Draw(mSimulation->GetParticlesCount(), 0);
+	context->Draw(mSimulation->GetParticlesCount() * 2, 0); //*2 because of LINELIST, LINESTRIP would require seperate draw calls or alpha blending to achieve seperate lines
 
 	ResetUtils::ResetShaders(context);
 	ResetUtils::ResetVertexShaderResources(context);

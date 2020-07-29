@@ -30,9 +30,11 @@ VertexOut HairVS(uint vertexId : SV_VertexID)
     viewProj = transpose(viewProj);
    
     
-    int strandIdx = (int) floor(vertexId / MAX_PARTICLE_COUNT);
+    int strandIdx = (int) floor(vertexId / (MAX_PARTICLE_COUNT * 2));
     
-    vertexId = min(vertexId % MAX_PARTICLE_COUNT, strands[strandIdx].ParticlesCount - 1);
+    vertexId = vertexId % (MAX_PARTICLE_COUNT * 2);
+    vertexId = floor(vertexId / 2) + vertexId % 2;
+    vertexId = min(vertexId, strands[strandIdx].ParticlesCount - 1);
     
     float3 pos = strands[strandIdx].Particles[vertexId].Position;
     
@@ -77,7 +79,6 @@ void HairGS(line VertexOut vin[2], inout TriangleStream<GeoOut> gout)
     gout.Append(bottomRight);
     gout.Append(topLeft);
     gout.Append(bottomLeft);
-
 }
 
 

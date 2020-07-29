@@ -52,7 +52,6 @@ float3 splines(uint vertexId, uint strandIdx)
     //Is slow af, but it works
     for (int i = 0; i < MAX_PARTICLE_COUNT; i++)
     {
-        
         k = 1;
         j = i;
         float Nik1 = Ni1(j, t, strandIdx);

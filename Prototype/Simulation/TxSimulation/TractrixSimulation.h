@@ -19,7 +19,8 @@ private:
 
 	static const int MAX_PARTICLE_COUNT = 16;
 	static const int MAX_KNOT_SIZE = MAX_PARTICLE_COUNT * 2;
-	UINT mStrandsCount = 1;
+	UINT mStrandsCount = 2;
+	int mNumberOfSegments = 3;
 
 public:
 
@@ -49,7 +50,6 @@ public:
 		int ParticlesCount;
 		int StrandIdx;
 		XMFLOAT3 HairRoot;
-		XMFLOAT3 DesiredHeadMovement;
 		XMFLOAT3 OriginalHeadPosition;
 		XMFLOAT3 DesiredSegmentDirections[MAX_PARTICLE_COUNT - 1];
 		Particle Particles[MAX_PARTICLE_COUNT];
@@ -58,16 +58,11 @@ public:
 		float MaxKnotValue;
 		float KnotHasChangedOnce;
 	};
-
+	
 	enum class Configuration
 	{
 		Z4Points,
-		ZReverse4Points,
-		Z4PointsStretch,
-		I4Points,
-		Z5Points,
-		ZReverse5Points,
-		Z5PointsStretch
+		Random
 	};
 
 	TractrixSimulation(ID3D11Device *device, ID3D11DeviceContext *context, PropertiesConstBuf props, XMFLOAT4 strandColor, Configuration config);
