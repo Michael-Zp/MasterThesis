@@ -1,11 +1,14 @@
 #include "tractrixSplineProperties.hlsl"
 
 
-cbuffer Time : register(b0)
+cbuffer SimulationParameters : register(b0)
 {
     float deltaTime;
     float totalTime;
-    float2 paddingTime;
+    float strandsCount;
+    float paddingForParamaters;
+    uint3 dispatchSize;
+    float padding2ForParameters;    
 };
 
 cbuffer Properties : register(b1)
@@ -17,8 +20,6 @@ cbuffer Properties : register(b1)
     float4 padding;
 };
 
-static const int3 numThreads = int3(1, 1, 1);
-static const float3 GRAVITY = float3(0, -.981, 0);
 
 RWStructuredBuffer<Strand> strands;
 
@@ -598,10 +599,16 @@ void KnotInsertionAndRemoval(int idx)
     }
 }
 
+static const int3 numThreads = int3(1, 1, 1);
+
 [numthreads(numThreads.x, numThreads.y, numThreads.z)]
 void Simulation(uint3 DTid : SV_DispatchThreadID)
 {
-    int idx = DTid.x * numThreads.x + DTid.y * numThreads.y + DTid.z * numThreads.z;
+    //TODO Something is not right if x and y direction is used
+    int idx = DTid.x * 1 + DTid.y * dispatchSize.x + DTid.z * dispatchSize.x * dispatchSize.y;
+    
+    if (idx >= strandsCount)
+        return;
     
     float3 Xp = strands[idx].OriginalHeadPosition;
     float timeDialation = 1;
@@ -647,9 +654,10 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
         
         desiredPosition[i] = strands[idx].Particles[i].Position + strands[idx].Particles[i].Velocity * deltaTime;
         
+        
         float3 desiredPositionByHairStyle = strands[idx].Particles[i - 1].Position + normalize(strands[idx].DesiredSegmentDirections[i - 1]) * oldSegmentLength[i - 1];
         float3 velocityToHairStylePos = desiredPositionByHairStyle - strands[idx].Particles[i].Position;
-        float hairStyleFactor = 0.5;
+        float hairStyleFactor = 1.5;
         velocityToHairStylePos = sign(velocityToHairStylePos) * pow(velocityToHairStylePos, float3(2, 2, 2)) * hairStyleFactor;
         
         float velLength = length(strands[idx].Particles[i].Velocity);
@@ -676,7 +684,7 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
         backwardPossibleParticlePositions[appp_i][appp_i] = desiredPosition[appp_i] / 2;
     }
     
-    const static int numberOfParticlesAveraged = 4;
+    const static int numberOfParticlesAveraged = 13;
     
     
     //Make copy of all temporary strands and pull them back

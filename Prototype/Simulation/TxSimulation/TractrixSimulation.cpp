@@ -17,6 +17,7 @@ TractrixSimulation::TractrixSimulation(ID3D11Device *device, ID3D11DeviceContext
 	for (int i = 0; i < strandPoints.size(); i++)
 	{
 		std::vector<XMFLOAT3> myDirections;
+		XMFLOAT3 basePoint;
 		switch (config)
 		{
 		case TractrixSimulation::Configuration::Z4Points:
@@ -25,8 +26,10 @@ TractrixSimulation::TractrixSimulation(ID3D11Device *device, ID3D11DeviceContext
 				XMFLOAT3(1, 0, 0),
 				XMFLOAT3(0, -1, 0)
 			};
+			basePoint = XMFLOAT3(0, 1.25, 0);
 			break;
 		case TractrixSimulation::Configuration::Random:
+		{
 			myDirections.resize(mNumberOfSegments);
 			for (int i = 0; i < mNumberOfSegments; i++)
 			{
@@ -38,6 +41,10 @@ TractrixSimulation::TractrixSimulation(ID3D11Device *device, ID3D11DeviceContext
 				vec = XMVector3Normalize(vec);
 				XMStoreFloat3(&myDirections[i], vec);
 			}
+			float x = (float(rand()) / float((RAND_MAX)) - 0.5) * 2;
+			float z = (float(rand()) / float((RAND_MAX)) - 0.5) * 2;
+			basePoint = XMFLOAT3(x, 1.25, z);
+		}
 			break;
 		default:
 			myDirections = {
@@ -45,10 +52,10 @@ TractrixSimulation::TractrixSimulation(ID3D11Device *device, ID3D11DeviceContext
 				XMFLOAT3(1, 0, 0),
 				XMFLOAT3(0, -1, 0)
 			};
+			basePoint = XMFLOAT3(0, 1.25, 0);
 			break;
 		}
 
-		XMFLOAT3 basePoint(0, 1.25, 0);
 		XMVECTOR currentPoint = XMLoadFloat3(&basePoint);
 		strandPoints[i].push_back(basePoint);
 		for (int k = 0; k < myDirections.size(); k++)
@@ -153,14 +160,14 @@ TractrixSimulation::TractrixSimulation(ID3D11Device *device, ID3D11DeviceContext
 
 
 	D3D11_BUFFER_DESC timeConstBufDesc;
-	timeConstBufDesc.ByteWidth = sizeof(TimeConstBuf);
+	timeConstBufDesc.ByteWidth = sizeof(SimulationConstBuf);
 	timeConstBufDesc.Usage = D3D11_USAGE_DYNAMIC;
 	timeConstBufDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	timeConstBufDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	timeConstBufDesc.MiscFlags = 0;
 	timeConstBufDesc.StructureByteStride = 0;
 
-	TimeConstBuf timeConstBufData;
+	SimulationConstBuf timeConstBufData;
 	timeConstBufData.DeltaTime = 0;
 	timeConstBufData.TotalTime = 0;
 
@@ -202,9 +209,11 @@ void TractrixSimulation::Simulate(const float deltaTime, ID3D11DeviceContext *co
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	HR(context->Map(mTimeConstBuf, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
 
-	TimeConstBuf *simConstBuf = (TimeConstBuf*)mappedResource.pData;
+	SimulationConstBuf *simConstBuf = (SimulationConstBuf*)mappedResource.pData;
 	simConstBuf->DeltaTime = deltaTime;
 	simConstBuf->TotalTime = ElapsedTimeInSimulation;
+	simConstBuf->StrandsCount = mStrandsCount;
+	simConstBuf->DispatchSize = mDispatchSize;
 
 	context->Unmap(mTimeConstBuf, 0);
 
@@ -218,7 +227,7 @@ void TractrixSimulation::Simulate(const float deltaTime, ID3D11DeviceContext *co
 	buf[1] = mPropertiesConstBuf;
 	context->CSSetConstantBuffers(0, 2, buf);
 
-	context->Dispatch(16, 1, 1);
+	context->Dispatch(mDispatchSize.x, mDispatchSize.y, mDispatchSize.z);
 
 	ResetUtils::ResetShaders(context);
 	ResetUtils::ResetComputeUavBuffer(context);

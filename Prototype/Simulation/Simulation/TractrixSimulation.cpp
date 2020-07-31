@@ -58,7 +58,7 @@ TractrixSimulation::TractrixSimulation(std::vector<std::vector<XMFLOAT3>*> posit
 
 
 	D3D11_BUFFER_DESC timeConstBuf;
-	timeConstBuf.ByteWidth = sizeof(TimeConstBuf);
+	timeConstBuf.ByteWidth = sizeof(SimulationConstBuf);
 	timeConstBuf.Usage = D3D11_USAGE_DYNAMIC;
 	timeConstBuf.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	timeConstBuf.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
@@ -70,7 +70,7 @@ TractrixSimulation::TractrixSimulation(std::vector<std::vector<XMFLOAT3>*> posit
 
 
 	D3D11_BUFFER_DESC propertiesConstBuf;
-	propertiesConstBuf.ByteWidth = sizeof(TimeConstBuf);
+	propertiesConstBuf.ByteWidth = sizeof(SimulationConstBuf);
 	propertiesConstBuf.Usage = D3D11_USAGE_DYNAMIC;
 	propertiesConstBuf.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	propertiesConstBuf.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
@@ -104,7 +104,7 @@ void TractrixSimulation::Simulate(const float deltaTime, ID3D11DeviceContext *co
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	HR(context->Map(mTimeConstBuf, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
 
-	TimeConstBuf *simConstBuf = (TimeConstBuf*)mappedResource.pData;
+	SimulationConstBuf *simConstBuf = (SimulationConstBuf*)mappedResource.pData;
 	simConstBuf->DeltaTime = deltaTime;
 	simConstBuf->TotalTime = ElapsedTimeInSimulation;
 

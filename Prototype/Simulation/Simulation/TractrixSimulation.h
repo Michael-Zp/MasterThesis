@@ -42,7 +42,7 @@ private:
 
 	float ElapsedTimeInSimulation = 0;
 
-	struct TimeConstBuf
+	struct SimulationConstBuf
 	{
 		float DeltaTime;
 		float TotalTime;
