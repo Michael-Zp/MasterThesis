@@ -28,6 +28,23 @@ TractrixSimulation::TractrixSimulation(ID3D11Device *device, ID3D11DeviceContext
 			};
 			basePoint = XMFLOAT3(0, 1.25, 0);
 			break;
+		case TractrixSimulation::Configuration::Z12Points:
+			myDirections = {
+				XMFLOAT3(0, -1, 0),
+				XMFLOAT3(1, 0, 0),
+				XMFLOAT3(0, -1, 0),
+				XMFLOAT3(-1, 0, 0),
+				XMFLOAT3(0, -1, 0),
+				XMFLOAT3(1, 0, 0),
+				XMFLOAT3(0, -1, 0),
+				XMFLOAT3(-1, 0, 0),
+				XMFLOAT3(0, -1, 0),
+				XMFLOAT3(1, 0, 0),
+				XMFLOAT3(0, -1, 0),
+				XMFLOAT3(-1, 0, 0)
+			};
+			basePoint = XMFLOAT3(0, 1.25, 0);
+			break;
 		case TractrixSimulation::Configuration::Random:
 		{
 			myDirections.resize(mNumberOfSegments);
@@ -50,7 +67,16 @@ TractrixSimulation::TractrixSimulation(ID3D11Device *device, ID3D11DeviceContext
 			myDirections = {
 				XMFLOAT3(0, -1, 0),
 				XMFLOAT3(1, 0, 0),
-				XMFLOAT3(0, -1, 0)
+				XMFLOAT3(0, -1, 0),
+				XMFLOAT3(-1, 0, 0),
+				XMFLOAT3(0, -1, 0),
+				XMFLOAT3(1, 0, 0),
+				XMFLOAT3(0, -1, 0),
+				XMFLOAT3(-1, 0, 0),
+				XMFLOAT3(0, -1, 0),
+				XMFLOAT3(1, 0, 0),
+				XMFLOAT3(0, -1, 0),
+				XMFLOAT3(-1, 0, 0)
 			};
 			basePoint = XMFLOAT3(0, 1.25, 0);
 			break;

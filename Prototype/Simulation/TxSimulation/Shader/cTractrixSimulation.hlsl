@@ -654,21 +654,29 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
         
         desiredPosition[i] = strands[idx].Particles[i].Position + strands[idx].Particles[i].Velocity * deltaTime;
         
+         
         
-        float3 desiredPositionByHairStyle = strands[idx].Particles[i - 1].Position + normalize(strands[idx].DesiredSegmentDirections[i - 1]) * oldSegmentLength[i - 1];
-        float3 velocityToHairStylePos = desiredPositionByHairStyle - strands[idx].Particles[i].Position;
-        float hairStyleFactor = 1.5;
-        velocityToHairStylePos = sign(velocityToHairStylePos) * pow(velocityToHairStylePos, float3(2, 2, 2)) * hairStyleFactor;
+        float3 desiredHairStyleDir = normalize(strands[idx].DesiredSegmentDirections[i - 1]);
+        float3 currentDir = normalize(strands[idx].Particles[i].Position - strands[idx].Particles[i - 1].Position);
+        float3 distToDesiredStyle = length(desiredHairStyleDir - currentDir);
+        
+        
+        //Get a vector, that is perpendicular to the strand direction
+        float3 perpendicularDir = normalize(desiredHairStyleDir - dot(currentDir, desiredHairStyleDir) * currentDir);
+            
+        
+        float hairStyleFactor = 1.0;
+        float3 velocityToHairStylePos = perpendicularDir * distToDesiredStyle * hairStyleFactor;
         
         float velLength = length(strands[idx].Particles[i].Velocity);
         
         float3 normalizedVelToHairStylePos = normalize(velocityToHairStylePos);
         if (all(!isnan(normalizedVelToHairStylePos)))
         {
-            velocityToHairStylePos = normalize(velocityToHairStylePos) * min(length(velocityToHairStylePos), velLength / 2);
+            velocityToHairStylePos = normalizedVelToHairStylePos * min(length(velocityToHairStylePos), velLength / 2);
+            strands[idx].Particles[i].Velocity += velocityToHairStylePos;
         }
         
-        strands[idx].Particles[i].Velocity += velocityToHairStylePos;
     }
     
     //TODO Maybe use less space with using one 1D array, and calculating like:

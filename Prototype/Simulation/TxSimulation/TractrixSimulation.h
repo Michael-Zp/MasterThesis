@@ -22,7 +22,7 @@ private:
 
 	static const int MAX_PARTICLE_COUNT = 16;
 	static const int MAX_KNOT_SIZE = MAX_PARTICLE_COUNT * 2;
-	UINT mStrandsCount = 5000;
+	UINT mStrandsCount = 1;
 	int mNumberOfSegments = 12;
 	XMUINT3 mDispatchSize = XMUINT3(128, 128, 4);
 
@@ -66,6 +66,7 @@ public:
 	enum class Configuration
 	{
 		Z4Points,
+		Z12Points,
 		Random
 	};
 
