@@ -657,7 +657,8 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
          
         
         float3 desiredHairStyleDir = normalize(strands[idx].DesiredSegmentDirections[i - 1]);
-        float3 currentDir = normalize(strands[idx].Particles[i].Position - strands[idx].Particles[i - 1].Position);
+        //float3 currentDir = normalize(strands[idx].Particles[i].Position - strands[idx].Particles[i - 1].Position);
+        float3 currentDir = normalize(desiredPosition[i] - strands[idx].Particles[i - 1].Position);
         float3 distToDesiredStyle = length(desiredHairStyleDir - currentDir);
         
         
@@ -665,7 +666,7 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
         float3 perpendicularDir = normalize(desiredHairStyleDir - dot(currentDir, desiredHairStyleDir) * currentDir);
             
         
-        float hairStyleFactor = 1.0;
+        float hairStyleFactor = 0.1;
         float3 velocityToHairStylePos = perpendicularDir * distToDesiredStyle * hairStyleFactor;
         
         float velLength = length(strands[idx].Particles[i].Velocity);
@@ -674,7 +675,8 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
         if (all(!isnan(normalizedVelToHairStylePos)))
         {
             velocityToHairStylePos = normalizedVelToHairStylePos * min(length(velocityToHairStylePos), velLength / 2);
-            strands[idx].Particles[i].Velocity += velocityToHairStylePos;
+            strands[idx].Particles[i].Velocity += velocityToHairStylePos / 2;
+            strands[idx].Particles[i - 1].Velocity -= velocityToHairStylePos / 2;
         }
         
     }
@@ -721,13 +723,27 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
     float3 currentParticlePosition[numberOfParticlesAveraged];
     for (int setPos_i = 0; setPos_i < numberOfParticlesAveraged; setPos_i++)
     {
+        //currentParticlePosition[setPos_i] = float3(0, 0, 0);
+        //for (int ppp_i = 0; ppp_i < numberOfParticlesAveraged; ppp_i++)
+        //{
+        //    currentParticlePosition[setPos_i] += forwardPossibleParticlePositions[ppp_i][setPos_i] + backwardPossibleParticlePositions[ppp_i][setPos_i];
+        //}
+        //currentParticlePosition[setPos_i] /= numberOfParticlesAveraged;
         
+        
+        
+        
+        float addFactor = 0.0;
         currentParticlePosition[setPos_i] = float3(0, 0, 0);
         for (int ppp_i = 0; ppp_i < numberOfParticlesAveraged; ppp_i++)
         {
-            currentParticlePosition[setPos_i] += forwardPossibleParticlePositions[ppp_i][setPos_i] + backwardPossibleParticlePositions[ppp_i][setPos_i];
+            float3 nextPos = forwardPossibleParticlePositions[ppp_i][setPos_i] + backwardPossibleParticlePositions[ppp_i][setPos_i];
+            int distFromParticle = abs(setPos_i - ppp_i);
+            float factor = 2 / pow(distFromParticle, distFromParticle);
+            addFactor += factor;
+            currentParticlePosition[setPos_i] += nextPos * factor;
         }
-        currentParticlePosition[setPos_i] /= numberOfParticlesAveraged;
+        currentParticlePosition[setPos_i] /= addFactor;
     }
     
     //The average positions can change the length of the segments.
