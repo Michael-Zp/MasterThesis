@@ -31,7 +31,7 @@ private:
 	XMMATRIX mView;
 	XMMATRIX mProj;
 
-	float mRadius = 5.0f;
+	float mRadius = 10.0f;
 	float mPhi = 0.5f*MathHelper::Pi;
 	float mTheta = 1.5f*MathHelper::Pi;
 

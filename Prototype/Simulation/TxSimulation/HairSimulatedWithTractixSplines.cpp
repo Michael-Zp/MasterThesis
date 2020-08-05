@@ -82,7 +82,7 @@ void HairSimulatedWithTractixSplines::Draw(float deltaTime, ID3D11DeviceContext 
 	}
 
 	mSimulation->Simulate(deltaTime, context);
-	DrawSplines(deltaTime, context);
+	//DrawSplines(deltaTime, context);
 	DrawControlPolygon(deltaTime, context);
 
 	mIsUpdated = false;

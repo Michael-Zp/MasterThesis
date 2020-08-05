@@ -134,6 +134,7 @@
     <ClCompile Include="GeometryGenerator.cpp" />
     <ClCompile Include="GeometryShader.cpp" />
     <ClCompile Include="HairBase.cpp" />
+    <ClCompile Include="HairLoader.cpp" />
     <ClCompile Include="HairSimulatedWithTractixSplines.cpp" />
     <ClCompile Include="LightHelper.cpp" />
     <ClCompile Include="main.cpp" />
@@ -157,6 +158,7 @@
     <ClInclude Include="GeometryGenerator.h" />
     <ClInclude Include="GeometryShader.h" />
     <ClInclude Include="HairBase.h" />
+    <ClInclude Include="HairLoader.h" />
     <ClInclude Include="HairSimulatedWithTractixSplines.h" />
     <ClInclude Include="IDrawable.h" />
     <ClInclude Include="LightHelper.h" />

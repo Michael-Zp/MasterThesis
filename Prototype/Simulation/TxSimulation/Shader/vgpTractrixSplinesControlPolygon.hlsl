@@ -54,7 +54,8 @@ void HairGS(line VertexOut vin[2], inout TriangleStream<GeoOut> gout)
     
     float4 color = toggleColors * float4(0, 0, 1, 1) + (1 - toggleColors) * float4(0, 1, 0, 1);
     
-    float width = 0.03;
+    //float width = 0.001;
+    float width = 0.02;
     
     float2 forward = float2(vin[1].position.xy - vin[0].position.xy);
     float4 side = normalize(float4(-forward.y, forward.x, 0, 0));

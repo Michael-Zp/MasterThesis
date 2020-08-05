@@ -20,10 +20,10 @@ private:
 		float PADDING2;
 	};
 
-	static const int MAX_PARTICLE_COUNT = 16;
+	static const int MAX_PARTICLE_COUNT = 32;
 	static const int MAX_KNOT_SIZE = MAX_PARTICLE_COUNT * 2;
-	UINT mStrandsCount = 1;
-	int mNumberOfSegments = 12;
+	UINT mStrandsCount = 2;
+	int mNumberOfSegments = 31;
 	XMUINT3 mDispatchSize = XMUINT3(128, 128, 4);
 
 public:
@@ -44,9 +44,7 @@ public:
 	struct Particle
 	{
 		XMFLOAT3 Position;
-		XMFLOAT4 Color;
 		XMFLOAT3 Velocity;
-		float Mass;
 	};
 
 	struct Strand
@@ -57,6 +55,7 @@ public:
 		XMFLOAT3 OriginalHeadPosition;
 		XMFLOAT3 DesiredSegmentDirections[MAX_PARTICLE_COUNT - 1];
 		Particle Particles[MAX_PARTICLE_COUNT];
+		XMFLOAT4 Color;
 		float Knot[MAX_KNOT_SIZE];
 		float KnotValues[MAX_KNOT_SIZE];
 		float MaxKnotValue;
@@ -67,6 +66,8 @@ public:
 	{
 		Z4Points,
 		Z12Points,
+		Z31Points,
+		LoadHair,
 		Random
 	};
 

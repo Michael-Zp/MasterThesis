@@ -110,7 +110,7 @@ VertexOut HairVS(uint vertexId : SV_VertexID)
     vout.position = mul(float4(pos, 1.0f), world);
     vout.position = mul(viewProj, vout.position);
     
-    vout.color = strands[strandIdx].Particles[0].Color;
+    vout.color = strands[strandIdx].Color;
 
     return vout;
 }
@@ -119,6 +119,7 @@ VertexOut HairVS(uint vertexId : SV_VertexID)
 [maxvertexcount(4)]
 void HairGS(line VertexOut vin[2], inout TriangleStream<GeoOut> gout)
 {
+    //float width = 0.002;
     float width = 0.08;
     
     float2 forward = float2(vin[1].position.xy - vin[0].position.xy);

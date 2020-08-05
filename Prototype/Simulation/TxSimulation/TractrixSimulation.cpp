@@ -1,11 +1,24 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "TractrixSimulation.h"
 
 #include "ResetUtils.h"
 #include "GeometryGenerator.h"
+#include "HairLoader.h"
 
 
 TractrixSimulation::TractrixSimulation(ID3D11Device *device, ID3D11DeviceContext *context, PropertiesConstBuf props, XMFLOAT4 strandColor, Configuration config)
 {
+	std::unique_ptr<HairLoader> hairLoader = nullptr;
+
+	if (config == TractrixSimulation::Configuration::LoadHair)
+	{
+		hairLoader = std::unique_ptr<HairLoader>(new HairLoader(fopen("./HairData/Ratboy/Ratboy_mohawk.tfx", "r")));
+
+		mStrandsCount = hairLoader->m_numTotalStrands;
+		mNumberOfSegments = hairLoader->m_numVerticesPerStrand - 1;
+	}
+
 	std::vector<std::vector<XMFLOAT3>> strandPoints;
 	strandPoints.resize(mStrandsCount);
 
@@ -13,84 +26,133 @@ TractrixSimulation::TractrixSimulation(ID3D11Device *device, ID3D11DeviceContext
 
 	srand(time(NULL));
 
+
 	strands.resize(strandPoints.size());
 	for (int i = 0; i < strandPoints.size(); i++)
+	//for (int i = 0; i < 1; i++)
 	{
-		std::vector<XMFLOAT3> myDirections;
-		XMFLOAT3 basePoint;
-		switch (config)
+		if (config == TractrixSimulation::Configuration::LoadHair)
 		{
-		case TractrixSimulation::Configuration::Z4Points:
-			myDirections = {
-				XMFLOAT3(0, -1, 0),
-				XMFLOAT3(1, 0, 0),
-				XMFLOAT3(0, -1, 0)
-			};
-			basePoint = XMFLOAT3(0, 1.25, 0);
-			break;
-		case TractrixSimulation::Configuration::Z12Points:
-			myDirections = {
-				XMFLOAT3(0, -1, 0),
-				XMFLOAT3(1, 0, 0),
-				XMFLOAT3(0, -1, 0),
-				XMFLOAT3(-1, 0, 0),
-				XMFLOAT3(0, -1, 0),
-				XMFLOAT3(1, 0, 0),
-				XMFLOAT3(0, -1, 0),
-				XMFLOAT3(-1, 0, 0),
-				XMFLOAT3(0, -1, 0),
-				XMFLOAT3(1, 0, 0),
-				XMFLOAT3(0, -1, 0),
-				XMFLOAT3(-1, 0, 0)
-			};
-			basePoint = XMFLOAT3(0, 1.25, 0);
-			break;
-		case TractrixSimulation::Configuration::Random:
-		{
-			myDirections.resize(mNumberOfSegments);
-			for (int i = 0; i < mNumberOfSegments; i++)
+			strandPoints[i].resize(hairLoader->m_numVerticesPerStrand);
+			for (int k = 0; k < hairLoader->m_numVerticesPerStrand; k++)
 			{
-				float x = (float(rand()) / float((RAND_MAX)) - 0.5) * 2;
-				float y = (float(rand()) / float((RAND_MAX)) - 0.5) * 2;
-				y = min(0.5, abs(y)) * -1;
-				float z = (float(rand()) / float((RAND_MAX)) - 0.5) * 2;
-				XMVECTOR vec = XMLoadFloat3(&XMFLOAT3(x, y, z));
-				vec = XMVector3Normalize(vec);
-				XMStoreFloat3(&myDirections[i], vec);
+				strandPoints[i][k] = hairLoader->m_positions[i * hairLoader->m_numVerticesPerStrand + k].Position;
 			}
-			float x = (float(rand()) / float((RAND_MAX)) - 0.5) * 2;
-			float z = (float(rand()) / float((RAND_MAX)) - 0.5) * 2;
-			basePoint = XMFLOAT3(x, 1.25, z);
 		}
-			break;
-		default:
-			myDirections = {
-				XMFLOAT3(0, -1, 0),
-				XMFLOAT3(1, 0, 0),
-				XMFLOAT3(0, -1, 0),
-				XMFLOAT3(-1, 0, 0),
-				XMFLOAT3(0, -1, 0),
-				XMFLOAT3(1, 0, 0),
-				XMFLOAT3(0, -1, 0),
-				XMFLOAT3(-1, 0, 0),
-				XMFLOAT3(0, -1, 0),
-				XMFLOAT3(1, 0, 0),
-				XMFLOAT3(0, -1, 0),
-				XMFLOAT3(-1, 0, 0)
-			};
-			basePoint = XMFLOAT3(0, 1.25, 0);
-			break;
-		}
-
-		XMVECTOR currentPoint = XMLoadFloat3(&basePoint);
-		strandPoints[i].push_back(basePoint);
-		for (int k = 0; k < myDirections.size(); k++)
+		else
 		{
-			XMVECTOR currDir = XMLoadFloat3(&myDirections[k]);
-			currentPoint += XMVector3Normalize(currDir);
-			XMFLOAT3 tempPoint;
-			XMStoreFloat3(&tempPoint, currentPoint);
-			strandPoints[i].push_back(tempPoint);
+			std::vector<XMFLOAT3> myDirections;
+			XMFLOAT3 basePoint;
+			switch (config)
+			{
+			case TractrixSimulation::Configuration::Z4Points:
+				myDirections = {
+					XMFLOAT3(0, -1, 0),
+					XMFLOAT3(1, 0, 0),
+					XMFLOAT3(0, -1, 0)
+				};
+				basePoint = XMFLOAT3(0, 1.25, 0);
+				break;
+			case TractrixSimulation::Configuration::Z12Points:
+				myDirections = {
+					XMFLOAT3(0, -1, 0),
+					XMFLOAT3(1, 0, 0),
+					XMFLOAT3(0, -1, 0),
+					XMFLOAT3(-1, 0, 0),
+					XMFLOAT3(0, -1, 0),
+					XMFLOAT3(1, 0, 0),
+					XMFLOAT3(0, -1, 0),
+					XMFLOAT3(-1, 0, 0),
+					XMFLOAT3(0, -1, 0),
+					XMFLOAT3(1, 0, 0),
+					XMFLOAT3(0, -1, 0),
+					XMFLOAT3(-1, 0, 0)
+				};
+				basePoint = XMFLOAT3(0, 1.25, 0);
+				break;
+			case TractrixSimulation::Configuration::Z31Points:
+				myDirections = {
+					XMFLOAT3(0, -1, 0),
+					XMFLOAT3(1, 0, 0),
+					XMFLOAT3(0, -1, 0),
+					XMFLOAT3(-1, 0, 0),
+					XMFLOAT3(0, -1, 0),
+					XMFLOAT3(1, 0, 0),
+					XMFLOAT3(0, -1, 0),
+					XMFLOAT3(-1, 0, 0),
+					XMFLOAT3(0, -1, 0),
+					XMFLOAT3(1, 0, 0),
+					XMFLOAT3(0, -1, 0),
+					XMFLOAT3(-1, 0, 0),
+					XMFLOAT3(0, -1, 0),
+					XMFLOAT3(1, 0, 0),
+					XMFLOAT3(0, -1, 0),
+					XMFLOAT3(-1, 0, 0),
+					XMFLOAT3(0, -1, 0),
+					XMFLOAT3(1, 0, 0),
+					XMFLOAT3(0, -1, 0),
+					XMFLOAT3(-1, 0, 0),
+					XMFLOAT3(0, -1, 0),
+					XMFLOAT3(1, 0, 0),
+					XMFLOAT3(0, -1, 0),
+					XMFLOAT3(-1, 0, 0),
+					XMFLOAT3(0, -1, 0),
+					XMFLOAT3(1, 0, 0),
+					XMFLOAT3(0, -1, 0),
+					XMFLOAT3(-1, 0, 0),
+					XMFLOAT3(0, -1, 0),
+					XMFLOAT3(1, 0, 0),
+					XMFLOAT3(0, -1, 0)
+				};
+				basePoint = XMFLOAT3(0, 1.25, 0);
+				break;
+			case TractrixSimulation::Configuration::Random:
+			{
+				myDirections.resize(mNumberOfSegments);
+				for (int i = 0; i < mNumberOfSegments; i++)
+				{
+					float x = (float(rand()) / float((RAND_MAX)) - 0.5) * 2;
+					float y = (float(rand()) / float((RAND_MAX)) - 0.5) * 2;
+					y = min(0.5, abs(y)) * -1;
+					float z = (float(rand()) / float((RAND_MAX)) - 0.5) * 2;
+					XMVECTOR vec = XMLoadFloat3(&XMFLOAT3(x, y, z));
+					vec = XMVector3Normalize(vec);
+					XMStoreFloat3(&myDirections[i], vec);
+				}
+				float x = (float(rand()) / float((RAND_MAX)) - 0.5) * 2;
+				float z = (float(rand()) / float((RAND_MAX)) - 0.5) * 2;
+				basePoint = XMFLOAT3(x, 1.25, z);
+			}
+			break;
+			default:
+				myDirections = {
+					XMFLOAT3(0, -1, 0),
+					XMFLOAT3(1, 0, 0),
+					XMFLOAT3(0, -1, 0),
+					XMFLOAT3(-1, 0, 0),
+					XMFLOAT3(0, -1, 0),
+					XMFLOAT3(1, 0, 0),
+					XMFLOAT3(0, -1, 0),
+					XMFLOAT3(-1, 0, 0),
+					XMFLOAT3(0, -1, 0),
+					XMFLOAT3(1, 0, 0),
+					XMFLOAT3(0, -1, 0),
+					XMFLOAT3(-1, 0, 0)
+				};
+				basePoint = XMFLOAT3(0, 1.25, 0);
+				break;
+			}
+
+			XMVECTOR currentPoint = XMLoadFloat3(&basePoint);
+			strandPoints[i].push_back(basePoint);
+			for (int k = 0; k < myDirections.size(); k++)
+			{
+				XMVECTOR currDir = XMLoadFloat3(&myDirections[k]);
+				currentPoint += XMVector3Normalize(currDir);
+				XMFLOAT3 tempPoint;
+				XMStoreFloat3(&tempPoint, currentPoint);
+				strandPoints[i].push_back(tempPoint);
+			}
 		}
 
 		strands[i].ParticlesCount = strandPoints[i].size();
@@ -98,6 +160,7 @@ TractrixSimulation::TractrixSimulation(ID3D11Device *device, ID3D11DeviceContext
 
 		strands[i].HairRoot = strandPoints[i][0];
 		strands[i].OriginalHeadPosition = strandPoints[i][strandPoints[i].size() - 1];
+		strands[i].Color = strandColor;
 		strands[i].KnotHasChangedOnce = 0.0;
 
 		int knotSize = strands[i].ParticlesCount + 4;
@@ -139,9 +202,7 @@ TractrixSimulation::TractrixSimulation(ID3D11Device *device, ID3D11DeviceContext
 		{
 			strands[i].Particles[k] = {
 				strandPoints[i][k],
-				strandColor,
-				XMFLOAT3(0, 0, 0),
-				1
+				XMFLOAT3(0, 0, 0)
 			};
 		}
 	}

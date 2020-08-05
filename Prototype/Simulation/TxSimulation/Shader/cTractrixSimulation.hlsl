@@ -8,7 +8,7 @@ cbuffer SimulationParameters : register(b0)
     float strandsCount;
     float paddingForParamaters;
     uint3 dispatchSize;
-    float padding2ForParameters;    
+    float padding2ForParameters;
 };
 
 cbuffer Properties : register(b1)
@@ -107,7 +107,7 @@ TractrixStepReturn TractrixStep(float3 tailPos, float3 headPos, float3 desiredHe
     {
         ret.NewHeadPos = desiredHeadPos;
         ret.NewTailPos = desiredHeadPos - (headPos - tailPos);
-        //strands[0].Particles[0].Color = float4(1, 0, 0, 1);
+        //strands[0].Color = float4(1, 0, 0, 1);
     }
     else
     {
@@ -163,14 +163,14 @@ TractrixStepReturn TractrixStep(float3 tailPos, float3 headPos, float3 desiredHe
             // Additionaly it is mathematically correct, because in a tractrix the movement of the tail has to be smaller than the movement of the head (thats the whole point of this thing)
             ret.NewTailPos = headPos + mul(tempPos, R);
             ret.NewHeadPos = desiredHeadPos;
-            //strands[0].Particles[0].Color = float4(0, 1, 0, 1);
+            //strands[0].Color = float4(0, 1, 0, 1);
         }
         else
         {
             //If the calculation fails, just set the head to the desiredHeadPos and 
             //pull the tail along the control polygon. This will prevent weird cases when in which
             //the tail will follow the exact same movement as the head (like a z falling straight down instead of flexing)
-            //strands[0].Particles[0].Color = float4(0, 0, 1, 1);
+            //strands[0].Color = float4(0, 0, 1, 1);
             ret.NewHeadPos = desiredHeadPos;
             ret.NewTailPos = tailPos + (headPos - tailPos) * length(desiredHeadPos - headPos);
         }
@@ -446,7 +446,7 @@ void KnotRemoval(int idx, int i, float dotProdL0L1, float dotProdL1L2)
     
     strands[idx].ParticlesCount--;
     strands[idx].Particles[i].Position = newPoint;
-    strands[idx].Particles[i].Color = float4(1, 1, 0, 1);
+    strands[idx].Color = float4(1, 1, 0, 1);
     
     
     float myKnotValue = strands[idx].KnotValues[i];
@@ -610,177 +610,195 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
     if (idx >= strandsCount)
         return;
     
-    float3 Xp = strands[idx].OriginalHeadPosition;
-    float timeDialation = 1;
+    if (doTractrix && !(stopIfKnotChanged && strands[idx].KnotHasChangedOnce))
+    {
+        float3 Xp = strands[idx].OriginalHeadPosition;
+        float timeDialation = 1;
    
-    float3 originalPosition[MAX_PARTICLE_COUNT];
-    for (int op_i = 0; op_i < MAX_PARTICLE_COUNT; op_i++)
-    {
-        originalPosition[op_i] = strands[idx].Particles[op_i].Position;
-    }
+        float3 originalPosition[MAX_PARTICLE_COUNT];
+        for (int op_i = 0; op_i < MAX_PARTICLE_COUNT; op_i++)
+        {
+            originalPosition[op_i] = strands[idx].Particles[op_i].Position;
+        }
     
-    //Get the old segment length of each segment, to maintain the strand structure
-    float oldSegmentLength[MAX_PARTICLE_COUNT - 1];
-    for (int u = 0; u < MAX_PARTICLE_COUNT - 1; u++)
-    {
-        oldSegmentLength[u] = length(strands[idx].Particles[u].Position - strands[idx].Particles[u + 1].Position);
-    }
+        //Get the old segment length of each segment, to maintain the strand structure
+        float oldSegmentLength[MAX_PARTICLE_COUNT - 1];
+        for (int u = 0; u < MAX_PARTICLE_COUNT - 1; u++)
+        {
+            oldSegmentLength[u] = length(strands[idx].Particles[u].Position - strands[idx].Particles[u + 1].Position);
+        }
     
     
-    float3 desiredPosition[MAX_PARTICLE_COUNT];
-    for (int dp_i = 0; dp_i < MAX_PARTICLE_COUNT; dp_i++)
-    {
-        desiredPosition[dp_i] = strands[idx].Particles[dp_i].Position;
-    }
+        float3 desiredPosition[MAX_PARTICLE_COUNT];
+        for (int dp_i = 0; dp_i < MAX_PARTICLE_COUNT; dp_i++)
+        {
+            desiredPosition[dp_i] = strands[idx].Particles[dp_i].Position;
+        }
     
-    desiredPosition[0] = strands[idx].HairRoot;
+        desiredPosition[0] = strands[idx].HairRoot;
     
-    //Save desired position of every particle if they would move independently (except the root)
-    //The root does not have a desiredPosition, because it does not move on its own and if the head moves, than the movement is covered by the backpull
-    for (int i = 1; i < MAX_PARTICLE_COUNT; i++)
-    {
-        strands[idx].Particles[i].Velocity += float3(0, -9.81, 0) * deltaTime * timeDialation;
-        strands[idx].Particles[i].Velocity *= 0.99; // Simple drag
+        //Save desired position of every particle if they would move independently (except the root)
+        //The root does not have a desiredPosition, because it does not move on its own and if the head moves, than the movement is covered by the backpull
+        for (int i = 1; i < MAX_PARTICLE_COUNT; i++)
+        {
+            strands[idx].Particles[i].Velocity += float3(0, -9.81, 0) * deltaTime * timeDialation;
+            strands[idx].Particles[i].Velocity *= 0.99; // Simple drag
         
         
-        //Drag force by air resistance
-        float airDensity = 1.2; //Density of air see: https://en.wikipedia.org/wiki/Density
-        float3 velocitySquare = pow(strands[idx].Particles[i].Velocity, float3(2, 2, 2));
-        float dragCoefficient = 0.47; //Hair should be roughtly a sphere see https://en.wikipedia.org/wiki/Drag_coefficient
-        float crossSection = (0.1 / 10) * oldSegmentLength[i - 1]; //Diameter of hair (ranges from 0.017mm to 0.18mm see https://en.wikipedia.org/wiki/Hair thus ~0.1mm thus 0.01cm)[right now I am in cm/s^2 for gravity]
-        float3 dragForce = 0.5 * airDensity * velocitySquare * dragCoefficient * crossSection;
+            //Drag force by air resistance
+            float airDensity = 1.2; //Density of air see: https://en.wikipedia.org/wiki/Density
+            float3 velocitySquare = pow(strands[idx].Particles[i].Velocity, float3(2, 2, 2));
+            float dragCoefficient = 0.47; //Hair should be roughtly a sphere see https://en.wikipedia.org/wiki/Drag_coefficient
+            float crossSection = (0.1 / 10) * oldSegmentLength[i - 1]; //Diameter of hair (ranges from 0.017mm to 0.18mm see https://en.wikipedia.org/wiki/Hair thus ~0.1mm thus 0.01cm)[right now I am in cm/s^2 for gravity]
+            float3 dragForce = 0.5 * airDensity * velocitySquare * dragCoefficient * crossSection;
         
-        strands[idx].Particles[i].Velocity -= sign(strands[idx].Particles[i].Velocity) * abs(dragForce);
+            strands[idx].Particles[i].Velocity -= sign(strands[idx].Particles[i].Velocity) * abs(dragForce);
         
-        desiredPosition[i] = strands[idx].Particles[i].Position + strands[idx].Particles[i].Velocity * deltaTime;
+            float3 currentPosition = strands[idx].Particles[i].Position;
+            float3 vel = strands[idx].Particles[i].Velocity;
+            desiredPosition[i] = currentPosition + vel * deltaTime;
         
          
         
-        float3 desiredHairStyleDir = normalize(strands[idx].DesiredSegmentDirections[i - 1]);
-        //float3 currentDir = normalize(strands[idx].Particles[i].Position - strands[idx].Particles[i - 1].Position);
-        float3 currentDir = normalize(desiredPosition[i] - strands[idx].Particles[i - 1].Position);
-        float3 distToDesiredStyle = length(desiredHairStyleDir - currentDir);
+            float3 desiredHairStyleDir = normalize(strands[idx].DesiredSegmentDirections[i - 1]);
+            //float3 currentDir = normalize(strands[idx].Particles[i].Position - strands[idx].Particles[i - 1].Position);
+            float3 currentDir = normalize(desiredPosition[i] - strands[idx].Particles[i - 1].Position);
+            float distToDesiredStyle = length(desiredHairStyleDir - currentDir);
         
         
-        //Get a vector, that is perpendicular to the strand direction
-        float3 perpendicularDir = normalize(desiredHairStyleDir - dot(currentDir, desiredHairStyleDir) * currentDir);
+            //Get a vector, that is perpendicular to the strand direction
+            float3 perpendicularDir = normalize(desiredHairStyleDir - dot(currentDir, desiredHairStyleDir) * currentDir);
             
         
-        float hairStyleFactor = 0.1;
-        float3 velocityToHairStylePos = perpendicularDir * distToDesiredStyle * hairStyleFactor;
+            float hairStyleFactor = 0.2;
+            float3 velocityToHairStylePos = perpendicularDir * distToDesiredStyle * hairStyleFactor;
         
-        float velLength = length(strands[idx].Particles[i].Velocity);
+            float velLength = length(strands[idx].Particles[i].Velocity);
         
-        float3 normalizedVelToHairStylePos = normalize(velocityToHairStylePos);
-        if (all(!isnan(normalizedVelToHairStylePos)))
-        {
-            velocityToHairStylePos = normalizedVelToHairStylePos * min(length(velocityToHairStylePos), velLength / 2);
-            strands[idx].Particles[i].Velocity += velocityToHairStylePos / 2;
-            strands[idx].Particles[i - 1].Velocity -= velocityToHairStylePos / 2;
+            float3 normalizedVelToHairStylePos = normalize(velocityToHairStylePos);
+            if (all(!isnan(normalizedVelToHairStylePos)))
+            {
+                velocityToHairStylePos = normalizedVelToHairStylePos * min(length(velocityToHairStylePos) / 4, velLength / 2);
+                strands[idx].Particles[i].Velocity += velocityToHairStylePos / 2;
+                strands[idx].Particles[i - 1].Velocity -= velocityToHairStylePos / 2;
+            }
+        
         }
-        
-    }
     
-    //TODO Maybe use less space with using one 1D array, and calculating like:
-    //Calc pos -> Multiply by factor -> Add to allPossPartPos[i] -> Start again
-    //After all are summed up -> take average
-    float3 forwardPossibleParticlePositions[MAX_PARTICLE_COUNT][MAX_PARTICLE_COUNT];
-    float3 backwardPossibleParticlePositions[MAX_PARTICLE_COUNT][MAX_PARTICLE_COUNT];
-    for (int appp_i = 0; appp_i < MAX_PARTICLE_COUNT; appp_i++)
-    {
-        RecursiveTractrixForward(idx, appp_i, desiredPosition[appp_i], forwardPossibleParticlePositions[appp_i]);
-        forwardPossibleParticlePositions[appp_i][appp_i] = desiredPosition[appp_i] / 2;
-        RecursiveTractrixBackward(idx, appp_i, desiredPosition[appp_i], backwardPossibleParticlePositions[appp_i]);
-        backwardPossibleParticlePositions[appp_i][appp_i] = desiredPosition[appp_i] / 2;
-    }
-    
-    const static int numberOfParticlesAveraged = 13;
-    
-    
-    //Make copy of all temporary strands and pull them back
-    //This backpull is used for altering the velocity of the particle for which the temporary strand was generated
-    //This backpull will prevent velocities from going out of hand as this will service as the counter force by the strand and the root
-    for (int backpullForce_i = 1; backpullForce_i < numberOfParticlesAveraged; backpullForce_i++)
-    {
-        for (int backpullForce_u = 0; backpullForce_u < numberOfParticlesAveraged; backpullForce_u++)
+        //TODO Maybe use less space with using one 1D array, and calculating like:
+        //Calc pos -> Multiply by factor -> Add to allPossPartPos[i] -> Start again
+        //After all are summed up -> take average
+        float3 forwardPossibleParticlePositions[MAX_PARTICLE_COUNT][MAX_PARTICLE_COUNT];
+        float3 backwardPossibleParticlePositions[MAX_PARTICLE_COUNT][MAX_PARTICLE_COUNT];
+        for (int appp_i = 0; appp_i < MAX_PARTICLE_COUNT; appp_i++)
         {
-            strands[idx].Particles[backpullForce_u].Position = forwardPossibleParticlePositions[backpullForce_i][backpullForce_u] + backwardPossibleParticlePositions[backpullForce_i][backpullForce_u];
+            RecursiveTractrixForward(idx, appp_i, desiredPosition[appp_i], forwardPossibleParticlePositions[appp_i]);
+            forwardPossibleParticlePositions[appp_i][appp_i] = desiredPosition[appp_i] / 2;
+            RecursiveTractrixBackward(idx, appp_i, desiredPosition[appp_i], backwardPossibleParticlePositions[appp_i]);
+            backwardPossibleParticlePositions[appp_i][appp_i] = desiredPosition[appp_i] / 2;
         }
-        
-        float3 backpullForcePositions[MAX_PARTICLE_COUNT];
-        for (int backpullForceZero_i = 0; backpullForceZero_i < MAX_PARTICLE_COUNT; backpullForceZero_i++)
+    
+        //const static int numberOfParticlesAveraged = 32;
+    
+    
+        //Make copy of all temporary strands and pull them back
+        //This backpull is used for altering the velocity of the particle for which the temporary strand was generated
+        //This backpull will prevent velocities from going out of hand as this will service as the counter force by the strand and the root
+        for (int backpullForce_i = 1; backpullForce_i < MAX_PARTICLE_COUNT; backpullForce_i++)
         {
-            backpullForcePositions[backpullForceZero_i] = float3(0, 0, 0);
+            for (int backpullForce_u = 0; backpullForce_u < MAX_PARTICLE_COUNT; backpullForce_u++)
+            {
+                strands[idx].Particles[backpullForce_u].Position = forwardPossibleParticlePositions[backpullForce_i][backpullForce_u] + backwardPossibleParticlePositions[backpullForce_i][backpullForce_u];
+            }
+        
+            float3 backpullForcePositions[MAX_PARTICLE_COUNT];
+            for (int backpullForceZero_i = 0; backpullForceZero_i < MAX_PARTICLE_COUNT; backpullForceZero_i++)
+            {
+                backpullForcePositions[backpullForceZero_i] = float3(0, 0, 0);
+            }
+        
+            //RecursiveTractrixForward(idx, 0, strands[idx].HairRoot, backpullForcePositions);
+            int backpullIndex = max(backpullForce_i - 3, 0);
+            //RecursiveTractrixForward(idx, backpullIndex, desiredPosition[backpullIndex], backpullForcePositions);
+            RecursiveTractrixForward(idx, backpullIndex, originalPosition[backpullIndex], backpullForcePositions);
+        
+            float3 backMovement = (backpullForcePositions[backpullForce_i] - strands[idx].Particles[backpullForce_i].Position) / deltaTime;
+            strands[idx].Particles[backpullForce_i].Velocity += backMovement;
         }
-        
-        RecursiveTractrixForward(idx, 0, strands[idx].HairRoot, backpullForcePositions);
-        
-        float3 backMovement = (backpullForcePositions[backpullForce_i] - strands[idx].Particles[backpullForce_i].Position) / deltaTime;
-        strands[idx].Particles[backpullForce_i].Velocity += backMovement;
-    }
     
         
-    float3 currentParticlePosition[numberOfParticlesAveraged];
-    for (int setPos_i = 0; setPos_i < numberOfParticlesAveraged; setPos_i++)
-    {
-        //currentParticlePosition[setPos_i] = float3(0, 0, 0);
-        //for (int ppp_i = 0; ppp_i < numberOfParticlesAveraged; ppp_i++)
-        //{
-        //    currentParticlePosition[setPos_i] += forwardPossibleParticlePositions[ppp_i][setPos_i] + backwardPossibleParticlePositions[ppp_i][setPos_i];
-        //}
-        //currentParticlePosition[setPos_i] /= numberOfParticlesAveraged;
-        
-        
-        
-        
-        float addFactor = 0.0;
-        currentParticlePosition[setPos_i] = float3(0, 0, 0);
-        for (int ppp_i = 0; ppp_i < numberOfParticlesAveraged; ppp_i++)
+        float3 currentParticlePosition[MAX_PARTICLE_COUNT];
+        for (int setPos_i = 0; setPos_i < MAX_PARTICLE_COUNT; setPos_i++)
         {
-            float3 nextPos = forwardPossibleParticlePositions[ppp_i][setPos_i] + backwardPossibleParticlePositions[ppp_i][setPos_i];
-            int distFromParticle = abs(setPos_i - ppp_i);
-            float factor = 2 / pow(distFromParticle, distFromParticle);
-            addFactor += factor;
-            currentParticlePosition[setPos_i] += nextPos * factor;
+            float addFactor = 0.0;
+            currentParticlePosition[setPos_i] = float3(0, 0, 0);
+            //for (int ppp_i = 0; ppp_i < MAX_PARTICLE_COUNT; ppp_i++)
+            //{
+            //    float3 nextPos = forwardPossibleParticlePositions[ppp_i][setPos_i] + backwardPossibleParticlePositions[ppp_i][setPos_i];
+            //    int distFromParticle = abs(setPos_i - ppp_i) + 1;
+            //    float factor = 2 / pow(distFromParticle, distFromParticle);
+            //    addFactor += factor;
+            //    currentParticlePosition[setPos_i] += nextPos * factor;
+            //}
+            
+            
+            
+            //After 4 steps the next point adds with 2 / 4^4 to the overall solution. This is so small it can be ignored.
+            int maxDistance = 4;
+            for (int ppp_i = setPos_i; ppp_i < setPos_i + maxDistance; ppp_i++)
+            {
+                float3 nextPos = forwardPossibleParticlePositions[ppp_i][setPos_i] + backwardPossibleParticlePositions[ppp_i][setPos_i];
+                int distFromParticle = abs(setPos_i - ppp_i) + 1;
+                float factor = 2 / pow(distFromParticle, distFromParticle);
+                factor *= step(-0.5, ppp_i) * step(ppp_i, MAX_PARTICLE_COUNT - 0.5);
+                addFactor += factor;
+                currentParticlePosition[setPos_i] += nextPos * factor;
+            }
+            for (ppp_i = setPos_i - 1; ppp_i > setPos_i - maxDistance; ppp_i--)
+            {
+                float3 nextPos = forwardPossibleParticlePositions[ppp_i][setPos_i] + backwardPossibleParticlePositions[ppp_i][setPos_i];
+                int distFromParticle = abs(setPos_i - ppp_i) + 1;
+                float factor = 2 / pow(distFromParticle, distFromParticle);
+                factor *= step(-0.5, ppp_i) * step(ppp_i, MAX_PARTICLE_COUNT - 0.5);
+                addFactor += factor;
+                currentParticlePosition[setPos_i] += nextPos * factor;
+            }
+            
+            currentParticlePosition[setPos_i] /= addFactor;
         }
-        currentParticlePosition[setPos_i] /= addFactor;
-    }
     
-    //The average positions can change the length of the segments.
-    //Thus just use these positions as pointers for the segment direction.
-    float3 averageDirs[numberOfParticlesAveraged - 1];
-    for (int getDirs_i = 0; getDirs_i < numberOfParticlesAveraged - 1; getDirs_i++)
-    {
-        averageDirs[getDirs_i] = currentParticlePosition[getDirs_i + 1] - currentParticlePosition[getDirs_i];
-    }
+        //The average positions can change the length of the segments.
+        //Thus just use these positions as pointers for the segment direction.
+        float3 averageDirs[MAX_PARTICLE_COUNT - 1];
+        for (int getDirs_i = 0; getDirs_i < MAX_PARTICLE_COUNT - 1; getDirs_i++)
+        {
+            averageDirs[getDirs_i] = currentParticlePosition[getDirs_i + 1] - currentParticlePosition[getDirs_i];
+        }
    
    
     
-    //Set the particle positions, by setting the root position as the average position of every simulation
-    //The next particle positions will be determined by the last set position + the average direction of the strand * the segment length
-    float3 currentPos = currentParticlePosition[0];
-    for (int setFinalPos_i = 0; setFinalPos_i < numberOfParticlesAveraged; setFinalPos_i++)
-    {
-        strands[idx].Particles[setFinalPos_i].Position = currentPos;
-        //Use the max to prevent the index from going out of bounds
-        currentPos += oldSegmentLength[min(setFinalPos_i, numberOfParticlesAveraged - 2)] * normalize(averageDirs[min(setFinalPos_i, numberOfParticlesAveraged - 2)]);
-    }
+        //Set the particle positions, by setting the root position as the average position of every simulation
+        //The next particle positions will be determined by the last set position + the average direction of the strand * the segment length
+        float3 currentPos = currentParticlePosition[0];
+        for (int setFinalPos_i = 0; setFinalPos_i < MAX_PARTICLE_COUNT; setFinalPos_i++)
+        {
+            strands[idx].Particles[setFinalPos_i].Position = currentPos;
+            //Use the max to prevent the index from going out of bounds
+            currentPos += oldSegmentLength[min(setFinalPos_i, MAX_PARTICLE_COUNT - 2)] * normalize(averageDirs[min(setFinalPos_i, MAX_PARTICLE_COUNT - 2)]);
+        }
    
     
     
-    if (doTractrix && !(stopIfKnotChanged && strands[idx].KnotHasChangedOnce))
-    {
         float3 positionsAfterBackpull[MAX_PARTICLE_COUNT];
         float3 velocityToAdd[MAX_PARTICLE_COUNT];
-        for (int u = 0; u < MAX_PARTICLE_COUNT; u++)
+        for (int velToAdd_u = 0; velToAdd_u < MAX_PARTICLE_COUNT; velToAdd_u++)
         {
-            positionsAfterBackpull[u] = float3(0, 0, 0);
-            velocityToAdd[u] = float3(0, 0, 0);
+            positionsAfterBackpull[velToAdd_u] = float3(0, 0, 0);
+            velocityToAdd[velToAdd_u] = float3(0, 0, 0);
         }
        
-        
-        
-        for (int addPerpendicularForce_i = 0; addPerpendicularForce_i < numberOfParticlesAveraged - 1; addPerpendicularForce_i++)
+                
+        for (int addPerpendicularForce_i = 0; addPerpendicularForce_i < MAX_PARTICLE_COUNT - 1; addPerpendicularForce_i++)
         {
             //A strand can move either anywhere if it is moved by its own velocity or it is swung in a circular motion with the connection to the previous particle as fix point.
             //All excessive force should be directed in this perpendicular/circular motion
@@ -788,23 +806,26 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
             float3 velocityDir = normalize(strands[idx].Particles[addPerpendicularForce_i + 1].Velocity);
             float3 velocityDirOfPrevious = normalize(strands[idx].Particles[addPerpendicularForce_i + 1 - 1].Velocity);
             float3 movementOfPrevious = normalize(strands[idx].Particles[addPerpendicularForce_i + 1 - 1].Position - originalPosition[addPerpendicularForce_i + 1 - 1]);
+            float3 lenOfMovementOfPrevious = length(strands[idx].Particles[addPerpendicularForce_i + 1 - 1].Position - originalPosition[addPerpendicularForce_i + 1 - 1]);
             
             //Get a vector, that is perpendicular to the strand direction, but this would specify a 360° space, thus orient it in the direction of the velocity.
             float3 perpendicularDir = normalize(velocityDirOfPrevious - dot(strandDir, velocityDirOfPrevious) * strandDir); //Project velocity of the previous particle on a plane perpendicular to the strand dir
             
             if (all(!isnan(perpendicularDir)))
             {
-                velocityToAdd[addPerpendicularForce_i + 1] = perpendicularDir * (length(strands[idx].HairRoot - strands[idx].Particles[0].Position)) / 2;
+                //velocityToAdd[addPerpendicularForce_i + 1] = perpendicularDir * (length(strands[idx].HairRoot - strands[idx].Particles[0].Position)) / 2;
+                velocityToAdd[addPerpendicularForce_i + 1] = perpendicularDir * (lenOfMovementOfPrevious);
             }
         }
         
         
+        
         RecursiveTractrixForward(idx, 0, strands[idx].HairRoot, positionsAfterBackpull);
+
         
-        
-        for (int i = 0; i < MAX_PARTICLE_COUNT; i++)
+        for (int posAfterBp_i = 0; posAfterBp_i < MAX_PARTICLE_COUNT; posAfterBp_i++)
         {
-            strands[idx].Particles[i].Position = positionsAfterBackpull[i];
+            strands[idx].Particles[posAfterBp_i].Position = positionsAfterBackpull[posAfterBp_i];
         }
         
         strands[idx].Particles[0].Position = strands[idx].HairRoot;
@@ -822,12 +843,12 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
         
         if (L > 2.0)
         {
-            strands[idx].Particles[0].Color = float4(1, 1, 1, 1);
+            strands[idx].Color = float4(1, 1, 1, 1);
             break;
         }
         else
         {
-            strands[idx].Particles[0].Color = float4(1, 0, 0, 1);
+            strands[idx].Color = float4(1, 0, 0, 1);
         }
     }
     
