@@ -148,7 +148,7 @@ TractrixSimulation::TractrixSimulation(ID3D11Device *device, ID3D11DeviceContext
 			for (int k = 0; k < myDirections.size(); k++)
 			{
 				XMVECTOR currDir = XMLoadFloat3(&myDirections[k]);
-				currentPoint += XMVector3Normalize(currDir);
+				currentPoint += XMVector3Normalize(currDir) * 0.1;
 				XMFLOAT3 tempPoint;
 				XMStoreFloat3(&tempPoint, currentPoint);
 				strandPoints[i].push_back(tempPoint);

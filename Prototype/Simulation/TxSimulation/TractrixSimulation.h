@@ -22,7 +22,7 @@ private:
 
 	static const int MAX_PARTICLE_COUNT = 32;
 	static const int MAX_KNOT_SIZE = MAX_PARTICLE_COUNT * 2;
-	UINT mStrandsCount = 2;
+	UINT mStrandsCount = 1;
 	int mNumberOfSegments = 31;
 	XMUINT3 mDispatchSize = XMUINT3(128, 128, 4);
 

@@ -86,16 +86,15 @@ TractrixStepReturn TractrixStep(float3 tailPos, float3 headPos, float3 desiredHe
     TractrixStepReturn ret;
     ret.NewHeadPos = headPos;
     ret.NewTailPos = tailPos;
-    
-    
+        
     float3 S = desiredHeadPos - headPos;
+    
     float lengthS = length(S);
         
     float L = length(headPos - tailPos);
-   
     
     float3 T = tailPos - headPos;
-        
+      
     
     //TODO See if this still a bug
     //See if they are linear independent, if cross == (0, 0, 0) they are not
@@ -103,7 +102,7 @@ TractrixStepReturn TractrixStep(float3 tailPos, float3 headPos, float3 desiredHe
     //Otherwise cross(S, T) = float3(0, 0, 0) and this is not good.
     //If they just pull it straight the tail should follow exactly the same
     float3 crossST = normalize(cross(S, T));
-    if (isnan(crossST.x) && isnan(crossST.y) && isnan(crossST.z))
+    if (all(isnan(crossST)))
     {
         ret.NewHeadPos = desiredHeadPos;
         ret.NewTailPos = desiredHeadPos - (headPos - tailPos);
@@ -140,6 +139,7 @@ TractrixStepReturn TractrixStep(float3 tailPos, float3 headPos, float3 desiredHe
         
     
         float3 tempPos = float3(xr_p, yr_p, 0);
+        
     
     
 
@@ -153,7 +153,6 @@ TractrixStepReturn TractrixStep(float3 tailPos, float3 headPos, float3 desiredHe
             tempPos = float3(-xr_np_n, yr_n, 0);
         }
     
-    
         
         float3 newTailPos = headPos + mul(tempPos, R);
         
@@ -164,18 +163,18 @@ TractrixStepReturn TractrixStep(float3 tailPos, float3 headPos, float3 desiredHe
             ret.NewTailPos = headPos + mul(tempPos, R);
             ret.NewHeadPos = desiredHeadPos;
             //strands[0].Color = float4(0, 1, 0, 1);
+
         }
         else
         {
             //If the calculation fails, just set the head to the desiredHeadPos and 
             //pull the tail along the control polygon. This will prevent weird cases when in which
-            //the tail will follow the exact same movement as the head (like a z falling straight down instead of flexing)
+            //the tail will follow the exact same movement as the head (like a z shape falling straight down instead of flexing)
             //strands[0].Color = float4(0, 0, 1, 1);
             ret.NewHeadPos = desiredHeadPos;
-            ret.NewTailPos = tailPos + (headPos - tailPos) * length(desiredHeadPos - headPos);
+            ret.NewTailPos = tailPos + normalize(headPos - tailPos) * length(desiredHeadPos - headPos);
         }
     }
-    
     
     
     return ret;
@@ -610,6 +609,77 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
     if (idx >= strandsCount)
         return;
     
+    bool onlyDoDebugStuff = false;
+    if (onlyDoDebugStuff)
+    {
+        float oldSegmentLength[MAX_PARTICLE_COUNT - 1];
+        for (int u = 0; u < MAX_PARTICLE_COUNT - 1; u++)
+        {
+            oldSegmentLength[u] = length(strands[idx].Particles[u].Position - strands[idx].Particles[u + 1].Position);
+        }
+        
+        int headIdx = strands[idx].ParticlesCount - 1;
+        
+        strands[idx].Particles[headIdx].Velocity += float3(0, -9.81, 0) * deltaTime;
+        strands[idx].Particles[headIdx].Velocity *= 0.99; // Simple drag
+        
+        float3 currentPosition = strands[idx].Particles[headIdx].Position;
+        float3 vel = strands[idx].Particles[headIdx].Velocity;
+        float3 desiredHeadPos = currentPosition + vel * deltaTime;
+    
+        float3 backwardPossibleParticlePositions[MAX_PARTICLE_COUNT];
+        
+        float3 basePos = strands[idx].Particles[0].Position;
+    
+        RecursiveTractrixBackward(idx, headIdx, desiredHeadPos, backwardPossibleParticlePositions);
+        backwardPossibleParticlePositions[headIdx] = desiredHeadPos;
+
+        
+
+        for (int setFinalPos_i = 0; setFinalPos_i < MAX_PARTICLE_COUNT; setFinalPos_i++)
+        {
+            strands[idx].Particles[setFinalPos_i].Position = backwardPossibleParticlePositions[setFinalPos_i] + basePos - basePos;
+        }
+        
+        float newSegmentLength[MAX_PARTICLE_COUNT - 1];
+        for (u = 0; u < MAX_PARTICLE_COUNT - 1; u++)
+        {
+            newSegmentLength[u] = length(strands[idx].Particles[u].Position - strands[idx].Particles[u + 1].Position);
+        }
+   
+        basePos = strands[idx].Particles[0].Position;
+    
+    
+        //float3 positionsAfterBackpull[MAX_PARTICLE_COUNT];
+        //RecursiveTractrixForward(idx, 0, strands[idx].HairRoot, positionsAfterBackpull);
+
+        
+        //for (int posAfterBp_i = 0; posAfterBp_i < MAX_PARTICLE_COUNT; posAfterBp_i++)
+        //{
+        //    strands[idx].Particles[posAfterBp_i].Position = positionsAfterBackpull[posAfterBp_i];
+        //}
+        
+        //strands[idx].Particles[0].Position = strands[idx].HairRoot;
+        
+        
+        for (int jumpToRoot_i = 0; jumpToRoot_i < MAX_PARTICLE_COUNT; jumpToRoot_i++)
+        {
+            //strands[idx].Particles[jumpToRoot_i].Position += strands[idx].HairRoot - strands[idx].Particles[0].Position;
+        }
+        
+
+        for (int enforceLengthConstraint_i = 1; enforceLengthConstraint_i < MAX_PARTICLE_COUNT; enforceLengthConstraint_i++)
+        {
+            float3 dir = strands[idx].Particles[enforceLengthConstraint_i].Position - basePos;
+            strands[idx].Particles[enforceLengthConstraint_i].Position = basePos + oldSegmentLength[enforceLengthConstraint_i - 1] * normalize(dir);
+            strands[idx].Particles[enforceLengthConstraint_i].Position += newSegmentLength[enforceLengthConstraint_i - 1] - newSegmentLength[enforceLengthConstraint_i - 1];
+            basePos = strands[idx].Particles[enforceLengthConstraint_i].Position;
+        }
+        
+        
+        return;
+    }
+    
     if (doTractrix && !(stopIfKnotChanged && strands[idx].KnotHasChangedOnce))
     {
         float3 Xp = strands[idx].OriginalHeadPosition;
@@ -637,12 +707,23 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
     
         desiredPosition[0] = strands[idx].HairRoot;
     
+        
+        float3 velocityToAdd[MAX_PARTICLE_COUNT];
+        for (int velToAdd_u = 0; velToAdd_u < MAX_PARTICLE_COUNT; velToAdd_u++)
+        {
+            velocityToAdd[velToAdd_u] = float3(0, 0, 0);
+        }
+        
+
+        
         //Save desired position of every particle if they would move independently (except the root)
         //The root does not have a desiredPosition, because it does not move on its own and if the head moves, than the movement is covered by the backpull
         for (int i = 1; i < MAX_PARTICLE_COUNT; i++)
         {
             strands[idx].Particles[i].Velocity += float3(0, -9.81, 0) * deltaTime * timeDialation;
             strands[idx].Particles[i].Velocity *= 0.99; // Simple drag
+            
+            //strands[idx].Particles[i].Velocity = normalize(strands[idx].Particles[i].Velocity) * min(length(strands[idx].Particles[i].Velocity), 1);
         
         
             //Drag force by air resistance
@@ -651,6 +732,7 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
             float dragCoefficient = 0.47; //Hair should be roughtly a sphere see https://en.wikipedia.org/wiki/Drag_coefficient
             float crossSection = (0.1 / 10) * oldSegmentLength[i - 1]; //Diameter of hair (ranges from 0.017mm to 0.18mm see https://en.wikipedia.org/wiki/Hair thus ~0.1mm thus 0.01cm)[right now I am in cm/s^2 for gravity]
             float3 dragForce = 0.5 * airDensity * velocitySquare * dragCoefficient * crossSection;
+            
         
             strands[idx].Particles[i].Velocity -= sign(strands[idx].Particles[i].Velocity) * abs(dragForce);
         
@@ -664,13 +746,14 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
             //float3 currentDir = normalize(strands[idx].Particles[i].Position - strands[idx].Particles[i - 1].Position);
             float3 currentDir = normalize(desiredPosition[i] - strands[idx].Particles[i - 1].Position);
             float distToDesiredStyle = length(desiredHairStyleDir - currentDir);
+            //float distToDesiredStyle = -((dot(desiredHairStyleDir, currentDir) - 1) / 2) * 2;
         
         
             //Get a vector, that is perpendicular to the strand direction
             float3 perpendicularDir = normalize(desiredHairStyleDir - dot(currentDir, desiredHairStyleDir) * currentDir);
             
         
-            float hairStyleFactor = 0.2;
+            float hairStyleFactor = 0.3;
             float3 velocityToHairStylePos = perpendicularDir * distToDesiredStyle * hairStyleFactor;
         
             float velLength = length(strands[idx].Particles[i].Velocity);
@@ -678,12 +761,16 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
             float3 normalizedVelToHairStylePos = normalize(velocityToHairStylePos);
             if (all(!isnan(normalizedVelToHairStylePos)))
             {
-                velocityToHairStylePos = normalizedVelToHairStylePos * min(length(velocityToHairStylePos) / 4, velLength / 2);
-                strands[idx].Particles[i].Velocity += velocityToHairStylePos / 2;
-                strands[idx].Particles[i - 1].Velocity -= velocityToHairStylePos / 2;
+                velocityToHairStylePos = normalizedVelToHairStylePos * min(length(velocityToHairStylePos) / 4, velLength / 4);
+                //velocityToAdd[i] += velocityToHairStylePos / 2;
+                //velocityToAdd[i - 1] -= velocityToHairStylePos / 2;
+                
+                //strands[idx].Particles[i].Velocity += velocityToHairStylePos / 2;
+                //strands[idx].Particles[i - 1].Velocity -= velocityToHairStylePos / 2;
             }
         
         }
+        
     
         //TODO Maybe use less space with using one 1D array, and calculating like:
         //Calc pos -> Multiply by factor -> Add to allPossPartPos[i] -> Start again
@@ -723,8 +810,25 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
             RecursiveTractrixForward(idx, backpullIndex, originalPosition[backpullIndex], backpullForcePositions);
         
             float3 backMovement = (backpullForcePositions[backpullForce_i] - strands[idx].Particles[backpullForce_i].Position) / deltaTime;
-            strands[idx].Particles[backpullForce_i].Velocity += backMovement;
+            
+            float3 normalizedBackMovement = normalize(backMovement);
+            float3 normalizedVelocity = normalize(strands[idx].Particles[backpullForce_i].Velocity);
+            if (all(!isnan(normalizedBackMovement)) && all(!isnan(normalizedVelocity)))
+            {
+                //velocityToAdd[backpullForce_i] += backMovement * clamp(-dot(normalizedBackMovement, normalizedVelocity), -1, 1);
+                //float minusFactor = length(backMovement) * dot(normalizedBackMovement, -normalizedVelocity);
+                //velocityToAdd[backpullForce_i] += -strands[idx].Particles[backpullForce_i].Velocity * length(backMovement) * minusFactor;
+                //velocityToAdd[backpullForce_i] += -strands[idx].Particles[backpullForce_i].Velocity * max(0, length(strands[idx].Particles[backpullForce_i].Velocity) - minusFactor);
+                
+                float minusFactor = length(backMovement) * clamp(dot(normalizedBackMovement, -normalizedVelocity), 0, 1);
+                float3 backVel = normalize(-strands[idx].Particles[backpullForce_i].Velocity);
+                minusFactor = min(length(strands[idx].Particles[backpullForce_i].Velocity), minusFactor);
+                velocityToAdd[backpullForce_i] += backVel * minusFactor;
+
+            }
+            //strands[idx].Particles[backpullForce_i].Velocity += backMovement;
         }
+        
     
         
         float3 currentParticlePosition[MAX_PARTICLE_COUNT];
@@ -773,6 +877,29 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
         for (int getDirs_i = 0; getDirs_i < MAX_PARTICLE_COUNT - 1; getDirs_i++)
         {
             averageDirs[getDirs_i] = currentParticlePosition[getDirs_i + 1] - currentParticlePosition[getDirs_i];
+            
+            //averageDirs[getDirs_i] = strands[idx].DesiredSegmentDirections[getDirs_i];
+            
+            //float3 normalizedAverageDir = normalize(averageDirs[getDirs_i]);
+            //float3 normalizedDesiredDir = normalize(strands[idx].DesiredSegmentDirections[getDirs_i]);
+            
+            //float3 v = cross(normalizedAverageDir, normalizedDesiredDir);
+            //float s = length(v);
+            //float c = dot(normalizedAverageDir, normalizedDesiredDir);
+            
+            ////float3x3 vx = float3x3(0, -v.z, v.y, v.z, 0, -v.x, -v.y, v.x, 0);
+            ////vx = transpose(vx);
+            //float3x3 vx = float3x3(0, v.z, -v.y, -v.z, 0, v.x, v.y, -v.x, 0);
+            
+            //float3x3 R = float3x3(1, 0, 0, 0, 1, 0, 0, 0, 1) + vx + pow(vx, 2) * (1 / (1 + c));
+
+            //averageDirs[getDirs_i] = mul(averageDirs[getDirs_i], R);
+            
+            
+            float3 middleDir = strands[idx].DesiredSegmentDirections[getDirs_i] - averageDirs[getDirs_i];
+            float3 middlePoint = averageDirs[getDirs_i] + middleDir * 0.001;
+            averageDirs[getDirs_i] = normalize(middlePoint);
+
         }
    
    
@@ -783,18 +910,16 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
         for (int setFinalPos_i = 0; setFinalPos_i < MAX_PARTICLE_COUNT; setFinalPos_i++)
         {
             strands[idx].Particles[setFinalPos_i].Position = currentPos;
-            //Use the max to prevent the index from going out of bounds
+            //Use the min to prevent the index from going out of bounds
             currentPos += oldSegmentLength[min(setFinalPos_i, MAX_PARTICLE_COUNT - 2)] * normalize(averageDirs[min(setFinalPos_i, MAX_PARTICLE_COUNT - 2)]);
         }
    
     
     
         float3 positionsAfterBackpull[MAX_PARTICLE_COUNT];
-        float3 velocityToAdd[MAX_PARTICLE_COUNT];
-        for (int velToAdd_u = 0; velToAdd_u < MAX_PARTICLE_COUNT; velToAdd_u++)
+        for (int posAfterBpInit_i = 0; posAfterBpInit_i < MAX_PARTICLE_COUNT; posAfterBpInit_i++)
         {
-            positionsAfterBackpull[velToAdd_u] = float3(0, 0, 0);
-            velocityToAdd[velToAdd_u] = float3(0, 0, 0);
+            positionsAfterBackpull[posAfterBpInit_i] = float3(0, 0, 0);
         }
        
                 
@@ -813,8 +938,8 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
             
             if (all(!isnan(perpendicularDir)))
             {
-                //velocityToAdd[addPerpendicularForce_i + 1] = perpendicularDir * (length(strands[idx].HairRoot - strands[idx].Particles[0].Position)) / 2;
-                velocityToAdd[addPerpendicularForce_i + 1] = perpendicularDir * (lenOfMovementOfPrevious);
+                //velocityToAdd[addPerpendicularForce_i + 1] += perpendicularDir * (length(strands[idx].HairRoot - strands[idx].Particles[0].Position)) / 2;
+                //velocityToAdd[addPerpendicularForce_i + 1] += perpendicularDir * (lenOfMovementOfPrevious);
             }
         }
         
@@ -833,25 +958,12 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
         
         for (int addForce_i = 0; addForce_i < MAX_PARTICLE_COUNT; addForce_i++)
         {
+            //strands[idx].Particles[addForce_i].Velocity += normalize(velocityToAdd[addForce_i]) * min(length(velocityToAdd[addForce_i]), length(strands[idx].Particles[addForce_i].Velocity) / 4);
             strands[idx].Particles[addForce_i].Velocity += velocityToAdd[addForce_i];
+
         }
     }
-    
-    for (int k = 0; k < MAX_PARTICLE_COUNT - 1; k++)
-    {
-        float L = length(strands[idx].Particles[k].Position - strands[idx].Particles[k + 1].Position);
-        
-        if (L > 2.0)
-        {
-            strands[idx].Color = float4(1, 1, 1, 1);
-            break;
-        }
-        else
-        {
-            strands[idx].Color = float4(1, 0, 0, 1);
-        }
-    }
-    
+
 
     //KnotInsertionAndRemoval(idx);
 }

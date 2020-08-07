@@ -42,8 +42,8 @@ bool Entry::Init()
 	}
 	
 	//mRenderItems.push_back(new HairSimulatedWithTractixSplines(md3dDevice, md3dImmediateContext, new TractrixSimulation(md3dDevice, md3dImmediateContext, { true, false, false, true }, (XMFLOAT4)Colors::Red, TractrixSimulation::Configuration::Random)));
-	//mRenderItems.push_back(new HairSimulatedWithTractixSplines(md3dDevice, md3dImmediateContext, new TractrixSimulation(md3dDevice, md3dImmediateContext, { true, false, false, true }, (XMFLOAT4)Colors::Red, TractrixSimulation::Configuration::Z12Points)));
-	mRenderItems.push_back(new HairSimulatedWithTractixSplines(md3dDevice, md3dImmediateContext, new TractrixSimulation(md3dDevice, md3dImmediateContext, { true, false, false, true }, (XMFLOAT4)Colors::Red, TractrixSimulation::Configuration::Z31Points)));
+	mRenderItems.push_back(new HairSimulatedWithTractixSplines(md3dDevice, md3dImmediateContext, new TractrixSimulation(md3dDevice, md3dImmediateContext, { true, false, false, true }, (XMFLOAT4)Colors::Red, TractrixSimulation::Configuration::Z12Points)));
+	//mRenderItems.push_back(new HairSimulatedWithTractixSplines(md3dDevice, md3dImmediateContext, new TractrixSimulation(md3dDevice, md3dImmediateContext, { true, false, false, true }, (XMFLOAT4)Colors::Red, TractrixSimulation::Configuration::Z31Points)));
 	//mRenderItems.push_back(new HairSimulatedWithTractixSplines(md3dDevice, md3dImmediateContext, new TractrixSimulation(md3dDevice, md3dImmediateContext, { true, false, false, false }, (XMFLOAT4)Colors::Red, TractrixSimulation::Configuration::LoadHair)));
 	mRenderItems.push_back(new HairBase(md3dDevice));
 
