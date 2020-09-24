@@ -1,4 +1,5 @@
-#include "tractrixSplineProperties.hlsl"
+//#include "tractrixSplineProperties.hlsl"
+#include "thirdTractrixSplineProperties.hlsl"
 
 cbuffer Camera
 {

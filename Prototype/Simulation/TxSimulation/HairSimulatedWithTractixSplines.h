@@ -4,12 +4,14 @@
 #include "ResetUtils.h"
 #include "RenderItem.h"
 #include "TractrixSimulation.h"
+#include "ThirdSimulation.h"
 
 
 class HairSimulatedWithTractixSplines : public IDrawable
 {
 public:
-	HairSimulatedWithTractixSplines(ID3D11Device *device, ID3D11DeviceContext *context, TractrixSimulation *simulation);
+	//HairSimulatedWithTractixSplines(ID3D11Device *device, ID3D11DeviceContext *context, TractrixSimulation *simulation);
+	HairSimulatedWithTractixSplines(ID3D11Device *device, ID3D11DeviceContext *context, ThirdSimulation *simulation);
 	~HairSimulatedWithTractixSplines();
 
 	void Draw(float deltaTime, ID3D11DeviceContext *context);
@@ -43,7 +45,8 @@ private:
 
 	RenderItem mSplineRenderItem;
 	RenderItem mControlPolygonRenderItem;
-	TractrixSimulation *mSimulation;
+	//TractrixSimulation *mSimulation;
+	ThirdSimulation *mSimulation;
 	
 	CameraConstantBuffer mConstantBufferData;
 	ID3D11Buffer *mCameraCB;

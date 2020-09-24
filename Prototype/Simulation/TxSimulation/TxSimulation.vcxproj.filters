@@ -111,6 +111,9 @@
     <ClCompile Include="HairLoader.cpp">
       <Filter>Source Files\Engine\Utils</Filter>
     </ClCompile>
+    <ClCompile Include="ThirdSimulation.cpp">
+      <Filter>Source Files\Simulation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entry.h">
@@ -185,13 +188,33 @@
     <ClInclude Include="HairLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ThirdSimulation.h">
+      <Filter>Header Files\Simulation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shader\tractrixSplineProperties.hlsl" />
-    <None Include="Shader\vgpTractrixSplinesControlPolygon.hlsl" />
-    <None Include="Shader\vgpTractrixSplinesSplines.hlsl" />
-    <None Include="Shader\vpHairBase.hlsl" />
     <None Include="Shader\cTractrixSimulation.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shader\tractrixSplineProperties.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shader\vgpTractrixSplinesControlPolygon.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shader\vgpTractrixSplinesSplines.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shader\vpHairBase.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shader\cSecondTractrixSimulation.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shader\cThirdTractrixSimulation.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shader\thirdTractrixSplineProperties.hlsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

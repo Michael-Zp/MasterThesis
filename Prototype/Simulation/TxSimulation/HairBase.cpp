@@ -113,7 +113,7 @@ void HairBase::UpdateCamera(ID3D11DeviceContext *context, XMMATRIX view, XMMATRI
 	HairBaseConstantBuffer *matrix = (HairBaseConstantBuffer*)mappedResource.pData;
 	matrix->view = XMMatrixTranspose(view);
 	matrix->proj = XMMatrixTranspose(proj);
-	matrix->world = XMMatrixTranspose(XMMatrixTranslation(0, 1.25, 0));
+	matrix->world = XMMatrixTranspose(XMMatrixTranslation(0, 5.25, 0));
 
 	context->Unmap(mConstantBuffer, 0);
 

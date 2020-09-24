@@ -60,7 +60,8 @@ void HairSimulatedWithTractixSplines::InitializeControlPolygonRenderItem(ID3D11D
 
 
 
-HairSimulatedWithTractixSplines::HairSimulatedWithTractixSplines(ID3D11Device *device, ID3D11DeviceContext *context, TractrixSimulation *simulation)
+//HairSimulatedWithTractixSplines::HairSimulatedWithTractixSplines(ID3D11Device *device, ID3D11DeviceContext *context, TractrixSimulation *simulation)
+HairSimulatedWithTractixSplines::HairSimulatedWithTractixSplines(ID3D11Device *device, ID3D11DeviceContext *context, ThirdSimulation *simulation)
 {
 	mSimulation = simulation;
 	InitializeSharedBuffers(device, context);
@@ -82,8 +83,8 @@ void HairSimulatedWithTractixSplines::Draw(float deltaTime, ID3D11DeviceContext 
 	}
 
 	mSimulation->Simulate(deltaTime, context);
-	//DrawSplines(deltaTime, context);
-	DrawControlPolygon(deltaTime, context);
+	DrawSplines(deltaTime, context);
+	//DrawControlPolygon(deltaTime, context);
 
 	mIsUpdated = false;
 }

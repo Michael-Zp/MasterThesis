@@ -143,6 +143,7 @@
     <ClCompile Include="ResetUtils.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="ThirdSimulation.cpp" />
     <ClCompile Include="TractrixSimulation.cpp" />
     <ClCompile Include="VertexShader.cpp" />
   </ItemGroup>
@@ -169,6 +170,7 @@
     <ClInclude Include="ResetUtils.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="ThirdSimulation.h" />
     <ClInclude Include="TractrixSimulation.h" />
     <ClInclude Include="VertexShader.h" />
   </ItemGroup>
@@ -186,6 +188,21 @@
       <FileType>Document</FileType>
     </None>
     <None Include="Shader\vpHairBase.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shader\cSecondTractrixSimulation.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shader\cThirdTractrixSimulation.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shader\thirdTractrixSplineProperties.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

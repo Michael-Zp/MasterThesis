@@ -29,7 +29,7 @@ TractrixSimulation::TractrixSimulation(ID3D11Device *device, ID3D11DeviceContext
 
 	strands.resize(strandPoints.size());
 	for (int i = 0; i < strandPoints.size(); i++)
-	//for (int i = 0; i < 1; i++)
+	//for (int i = 0; i < 200; i++)
 	{
 		if (config == TractrixSimulation::Configuration::LoadHair)
 		{
@@ -148,7 +148,7 @@ TractrixSimulation::TractrixSimulation(ID3D11Device *device, ID3D11DeviceContext
 			for (int k = 0; k < myDirections.size(); k++)
 			{
 				XMVECTOR currDir = XMLoadFloat3(&myDirections[k]);
-				currentPoint += XMVector3Normalize(currDir) * 0.1;
+				currentPoint += XMVector3Normalize(currDir) * 1;
 				XMFLOAT3 tempPoint;
 				XMStoreFloat3(&tempPoint, currentPoint);
 				strandPoints[i].push_back(tempPoint);
@@ -280,6 +280,7 @@ TractrixSimulation::TractrixSimulation(ID3D11Device *device, ID3D11DeviceContext
 
 
 	mComputeShader = new ComputeShader(L"./Shader/cTractrixSimulation.hlsl", "Simulation", true);
+	//mComputeShader = new ComputeShader(L"./Shader/cSecondTractrixSimulation.hlsl", "Simulation", true);
 	mComputeShader->prepare(device);
 }
 

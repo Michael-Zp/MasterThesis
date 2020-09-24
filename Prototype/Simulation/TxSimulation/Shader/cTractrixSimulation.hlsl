@@ -897,7 +897,7 @@ void Simulation(uint3 DTid : SV_DispatchThreadID)
             
             
             float3 middleDir = strands[idx].DesiredSegmentDirections[getDirs_i] - averageDirs[getDirs_i];
-            float3 middlePoint = averageDirs[getDirs_i] + middleDir * 0.001;
+            float3 middlePoint = averageDirs[getDirs_i] + middleDir * 0.00001;
             averageDirs[getDirs_i] = normalize(middlePoint);
 
         }

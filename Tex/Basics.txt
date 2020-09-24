@@ -1,5 +1,6 @@
 #######################################################
-#https://www.martinruenz.de/files/ruenz12bachelor.pdf
+#https://www.martinruenz.de/files/ruenz12bachelor.pdf //Does not work anymore
+#https://userpages.uni-koblenz.de/~cg/Bachelorarbeiten/BA_MartinRuenz.pdf
 #######################################################
 
 Properties of human hair:
